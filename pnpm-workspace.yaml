@@ -1,6 +1,10 @@
 packages:
-  - "."
+  - .
 
-minimumReleaseAge: 2880 # 2 days
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
 
-minimumReleaseExclude:
+minimumReleaseAge: 2880
+
+minimumReleaseExclude: null

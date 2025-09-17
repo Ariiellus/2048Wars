@@ -8,6 +8,25 @@ export default function Board() {
   const [gameState, dispatch] = useReducer(gameReducer, initialState);
   const initialized = useRef(false);
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    event.preventDefault(); // prevents scrolling when using arrow keys
+
+    switch (event.code) {
+      case "ArrowUp":
+        dispatch({ type: "MOVE_UP" });
+        break;
+      case "ArrowDown":
+        dispatch({ type: "MOVE_DOWN" });
+        break;
+      case "ArrowLeft":
+        dispatch({ type: "MOVE_LEFT" });
+        break;
+      case "ArrowRight":
+        dispatch({ type: "MOVE_RIGHT" });
+        break;
+    }
+  };
+
   const renderGrid = () => {
     const cells: React.ReactNode[] = [];
     const totalCellsCount = 16;
@@ -33,6 +52,14 @@ export default function Board() {
       dispatch({ type: "CREATE_TILE", tile: { position: [0, 2], value: 2 } });
       initialized.current = true;
     }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   return (
