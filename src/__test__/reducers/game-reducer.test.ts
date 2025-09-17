@@ -63,8 +63,6 @@ describe("gameReducer", () => {
       expect(typeof stateAfter.board[0][1]).toBe("string");
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[3][1])).toBeTruthy();
-
-
     });
 
     it("should move stack tiles with the same value on top of each other", () => {
@@ -101,8 +99,6 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[2][0])).toBeTruthy();
       expect(isNil(stateAfter.board[3][0])).toBeTruthy();
-
-
     });
   });
 
@@ -176,7 +172,7 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[0][0])).toBeTruthy();
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[2][0])).toBeTruthy();
-      expect(typeof stateAfter.board[3][0]).toBe("string")
+      expect(typeof stateAfter.board[3][0]).toBe("string");
     });
   });
 
@@ -215,8 +211,6 @@ describe("gameReducer", () => {
       expect(typeof stateAfter.board[1][0]).toBe("string");
       expect(typeof stateAfter.board[3][0]).toBe("string");
       expect(isNil(stateAfter.board[3][1])).toBeTruthy();
-
-
     });
 
     it("should move stack tiles with the same value on top of each other", () => {
@@ -293,8 +287,6 @@ describe("gameReducer", () => {
       expect(typeof stateAfter.board[3][3]).toBe("string");
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[3][1])).toBeTruthy();
-
-
     });
 
     it("should move stack tiles with the same value on top of each other", () => {
