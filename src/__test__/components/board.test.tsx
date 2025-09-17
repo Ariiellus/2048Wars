@@ -7,4 +7,10 @@ describe("Board", () => {
     const cellElements = container.querySelectorAll(".cell");
     expect(cellElements).toHaveLength(16);
   });
+
+  it("should render board with 2 tiles", () => {
+    const { container } = render(<Board />);
+    const tileElements = container.querySelectorAll(".tile");
+    expect(tileElements).toHaveLength(2);
+  });
 });
