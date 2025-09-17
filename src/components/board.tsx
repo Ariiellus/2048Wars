@@ -47,15 +47,15 @@ export default function Board() {
   };
 
   /*
-  * @notice: this is the initial state for the game
-  * @notice: this need to be randomized to create a different initial state for every player
-  * @notice: this will not manage the randomness for the creation of new tiles after every move
-  */
+   * @notice: this is the initial state for the game
+   * @notice: this need to be randomized to create a different initial state for every player
+   * @notice: this will not manage the randomness for the creation of new tiles after every move
+   */
   useEffect(() => {
     if (initialized.current === false) {
       dispatch({ type: "CREATE_TILE", tile: { position: [0, 1], value: 2 } });
       dispatch({ type: "CREATE_TILE", tile: { position: [0, 2], value: 2 } });
-        initialized.current = true;
+      initialized.current = true;
     }
   }, []);
 
