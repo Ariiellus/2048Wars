@@ -1,18 +1,16 @@
 import { Tile, TileMap } from "@/models/tile";
 import { uid } from "uid";
 import { tileCountPerDimension } from "@constants";
-import { isNil } from "lodash";
+import { flattenDeep, isNil } from "lodash";
 
 type State = { board: string[][]; tiles: TileMap };
 type Action =
-  | {
-      type: "CREATE_TILE";
-      tile: Tile;
-    }
+  | { type: "CREATE_TILE"; tile: Tile }
   | { type: "MOVE_UP" }
   | { type: "MOVE_DOWN" }
   | { type: "MOVE_LEFT" }
-  | { type: "MOVE_RIGHT" };
+  | { type: "MOVE_RIGHT" }
+  | { type: "CLEAN_UP" };
 
 export function createBoard() {
   const board: string[][] = [];
@@ -30,6 +28,28 @@ export default function gameReducer(
   action: Action,
 ) {
   switch (action.type) {
+    case "CLEAN_UP": {
+      const flattenBoard = flattenDeep(state.board);
+      const newTiles: TileMap = flattenBoard.reduce(
+        (result, tileId: string) => {
+          if (isNil(tileId)) {
+            return result;
+          }
+
+          return {
+            ...result,
+            [tileId]: state.tiles[tileId],
+          };
+        },
+        {},
+      );
+
+      return {
+        ...state,
+        tiles: newTiles,
+      };
+    }
+
     case "CREATE_TILE": {
       const tileId = uid();
       const [x, y] = action.tile.position;
@@ -42,6 +62,7 @@ export default function gameReducer(
         tiles: { ...state.tiles, [tileId]: { id: tileId, ...action.tile } },
       };
     }
+
     case "MOVE_UP": {
       const newBoard = createBoard();
       const newTiles: TileMap = {};
@@ -68,7 +89,7 @@ export default function gameReducer(
             newBoard[newY][x] = tileId;
             newTiles[tileId] = { ...currentTile, position: [x, newY] };
 
-            previousTile = currentTile;
+            previousTile = newTiles[tileId];
             newY++;
           }
         }
@@ -106,7 +127,7 @@ export default function gameReducer(
             newBoard[newY][x] = tileId;
             newTiles[tileId] = { ...currentTile, position: [x, newY] };
 
-            previousTile = currentTile;
+            previousTile = newTiles[tileId];
             newY--;
           }
         }
@@ -144,7 +165,7 @@ export default function gameReducer(
             newBoard[y][newX] = tileId;
             newTiles[tileId] = { ...currentTile, position: [newX, y] };
 
-            previousTile = currentTile;
+            previousTile = newTiles[tileId];
             newX++;
           }
         }
@@ -181,7 +202,7 @@ export default function gameReducer(
             newBoard[y][newX] = tileId;
             newTiles[tileId] = { ...currentTile, position: [newX, y] };
 
-            previousTile = currentTile;
+            previousTile = newTiles[tileId];
             newX--;
           }
         }

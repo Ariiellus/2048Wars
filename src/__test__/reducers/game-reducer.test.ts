@@ -5,6 +5,39 @@ import { useReducer } from "react";
 import { isNil } from "lodash";
 
 describe("gameReducer", () => {
+  describe("CLEAN_UP", () => {
+    it("should remove one of the tiles that have been merged", () => {
+      const tile1: Tile = {
+        position: [0, 0],
+        value: 2,
+      };
+
+      const tile2: Tile = {
+        position: [0, 3],
+        value: 2,
+      };
+
+      const { result } = renderHook(() =>
+        useReducer(gameReducer, initialState),
+      );
+      const [, dispatch] = result.current;
+
+      act(() => {
+        dispatch({ type: "CREATE_TILE", tile: tile1 });
+        dispatch({ type: "CREATE_TILE", tile: tile2 });
+        dispatch({ type: "MOVE_UP" });
+      });
+
+      const [stateBefore] = result.current;
+      expect(Object.values(stateBefore.tiles)).toHaveLength(2);
+
+      act(() => dispatch({ type: "CLEAN_UP" }));
+
+      const [stateAfter] = result.current;
+      expect(Object.values(stateAfter.tiles)).toHaveLength(1);
+    });
+  });
+
   describe("create_tile", () => {
     it("should create a new tile", () => {
       const tile: Tile = {
