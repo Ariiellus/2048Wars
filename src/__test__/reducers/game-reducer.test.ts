@@ -22,7 +22,9 @@ describe("gameReducer", () => {
       const [state] = result.current;
 
       expect(state.board[0][0]).toBeDefined();
-      expect(Object.values(state.tiles)).toEqual([tile]);
+      expect(Object.values(state.tiles)).toEqual([
+        { id: state.board[0][0], ...tile },
+      ]);
     });
   });
 
@@ -54,8 +56,6 @@ describe("gameReducer", () => {
       expect(typeof stateBefore.board[1][0]).toBe("string");
       expect(typeof stateBefore.board[3][1]).toBe("string");
 
-      // console.log("stateBefore", stateBefore);
-
       act(() => dispatch({ type: "MOVE_UP" }));
 
       const [stateAfter] = result.current;
@@ -65,7 +65,7 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[3][1])).toBeTruthy();
     });
 
-    it("should move stack tiles with the same value on top of each other", () => {
+    it("should merge tiles with the same value", () => {
       const tile1: Tile = {
         position: [0, 1],
         value: 2,
@@ -88,14 +88,14 @@ describe("gameReducer", () => {
 
       const [stateBefore] = result.current;
       expect(isNil(stateBefore.board[0][0])).toBeTruthy();
-      expect(typeof stateBefore.board[1][0]).toBe("string");
+      expect(stateBefore.tiles[stateBefore.board[1][0]].value).toBe(2);
       expect(isNil(stateBefore.board[2][0])).toBeTruthy();
-      expect(typeof stateBefore.board[3][0]).toBe("string");
+      expect(stateBefore.tiles[stateBefore.board[3][0]].value).toBe(2);
 
       act(() => dispatch({ type: "MOVE_UP" }));
 
       const [stateAfter] = result.current;
-      expect(typeof stateAfter.board[0][0]).toBe("string");
+      expect(stateAfter.tiles[stateAfter.board[0][0]].value).toBe(4);
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[2][0])).toBeTruthy();
       expect(isNil(stateAfter.board[3][0])).toBeTruthy();
@@ -110,7 +110,7 @@ describe("gameReducer", () => {
       };
 
       const tile2: Tile = {
-        position: [1, 3],
+        position: [0, 3],
         value: 2,
       };
 
@@ -126,20 +126,20 @@ describe("gameReducer", () => {
 
       const [stateBefore] = result.current;
       expect(isNil(stateBefore.board[0][0])).toBeTruthy();
-      expect(typeof stateBefore.board[1][0]).toBe("string");
-      expect(typeof stateBefore.board[3][1]).toBe("string");
-
-      // console.log("stateBefore", stateBefore);
+      expect(stateBefore.tiles[stateBefore.board[1][0]].value).toBe(2);
+      expect(isNil(stateBefore.board[2][0])).toBeTruthy();
+      expect(stateBefore.tiles[stateBefore.board[3][0]].value).toBe(2);
 
       act(() => dispatch({ type: "MOVE_DOWN" }));
 
       const [stateAfter] = result.current;
-      expect(typeof stateAfter.board[3][0]).toBe("string");
-      expect(typeof stateAfter.board[3][1]).toBe("string");
+      expect(isNil(stateAfter.board[0][0])).toBeTruthy();
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
+      expect(isNil(stateAfter.board[2][0])).toBeTruthy();
+      expect(stateAfter.tiles[stateAfter.board[3][0]].value).toBe(4);
     });
 
-    it("should move stack tiles with the same value on top of each other", () => {
+    it("should merge tiles with the same value", () => {
       const tile1: Tile = {
         position: [0, 1],
         value: 2,
@@ -203,8 +203,6 @@ describe("gameReducer", () => {
       expect(typeof stateBefore.board[1][0]).toBe("string");
       expect(typeof stateBefore.board[3][1]).toBe("string");
 
-      // console.log("stateBefore", stateBefore);
-
       act(() => dispatch({ type: "MOVE_LEFT" }));
 
       const [stateAfter] = result.current;
@@ -213,7 +211,7 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[3][1])).toBeTruthy();
     });
 
-    it("should move stack tiles with the same value on top of each other", () => {
+    it("should merge tiles with the same value", () => {
       const tile1: Tile = {
         position: [0, 1],
         value: 2,
@@ -235,15 +233,15 @@ describe("gameReducer", () => {
       });
 
       const [stateBefore] = result.current;
-      expect(typeof stateBefore.board[1][0]).toBe("string");
+      expect(stateBefore.tiles[stateBefore.board[1][0]].value).toBe(2);
       expect(isNil(stateBefore.board[1][1])).toBeTruthy();
       expect(isNil(stateBefore.board[1][2])).toBeTruthy();
-      expect(typeof stateBefore.board[1][3]).toBe("string");
+      expect(stateBefore.tiles[stateBefore.board[1][3]].value).toBe(2);
 
       act(() => dispatch({ type: "MOVE_LEFT" }));
 
       const [stateAfter] = result.current;
-      expect(typeof stateAfter.board[1][0]).toBe("string");
+      expect(stateAfter.tiles[stateAfter.board[1][0]].value).toBe(4);
       expect(isNil(stateAfter.board[1][1])).toBeTruthy();
       expect(isNil(stateAfter.board[1][2])).toBeTruthy();
       expect(isNil(stateAfter.board[1][3])).toBeTruthy();
@@ -278,8 +276,6 @@ describe("gameReducer", () => {
       expect(typeof stateBefore.board[1][0]).toBe("string");
       expect(typeof stateBefore.board[3][1]).toBe("string");
 
-      // console.log("stateBefore", stateBefore);
-
       act(() => dispatch({ type: "MOVE_RIGHT" }));
 
       const [stateAfter] = result.current;
@@ -289,7 +285,7 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[3][1])).toBeTruthy();
     });
 
-    it("should move stack tiles with the same value on top of each other", () => {
+    it("should merge tiles with the same value", () => {
       const tile1: Tile = {
         position: [0, 1],
         value: 2,
@@ -311,10 +307,10 @@ describe("gameReducer", () => {
       });
 
       const [stateBefore] = result.current;
-      expect(typeof stateBefore.board[1][0]).toBe("string");
+      expect(stateBefore.tiles[stateBefore.board[1][0]].value).toBe(2);
       expect(isNil(stateBefore.board[1][1])).toBeTruthy();
       expect(isNil(stateBefore.board[1][2])).toBeTruthy();
-      expect(typeof stateBefore.board[1][3]).toBe("string");
+      expect(stateBefore.tiles[stateBefore.board[1][3]].value).toBe(2);
 
       act(() => dispatch({ type: "MOVE_RIGHT" }));
 
@@ -322,7 +318,7 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[1][1])).toBeTruthy();
       expect(isNil(stateAfter.board[1][2])).toBeTruthy();
-      expect(typeof stateAfter.board[1][3]).toBe("string");
+      expect(stateAfter.tiles[stateAfter.board[1][3]].value).toBe(4);
     });
   });
 });

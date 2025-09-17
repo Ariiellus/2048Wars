@@ -39,7 +39,7 @@ export default function gameReducer(
       return {
         ...state,
         board: newBoard,
-        tiles: { ...state.tiles, [tileId]: action.tile },
+        tiles: { ...state.tiles, [tileId]: { id: tileId, ...action.tile } },
       };
     }
     case "MOVE_UP": {
@@ -56,6 +56,10 @@ export default function gameReducer(
 
           if (!isNil(tileId)) {
             if (previousTile?.value === currentTile.value) {
+              newTiles[previousTile.id as string] = {
+                ...previousTile,
+                value: previousTile.value * 2,
+              };
               newTiles[tileId] = { ...currentTile, position: [x, newY - 1] };
               previousTile = undefined;
               continue;
@@ -90,6 +94,10 @@ export default function gameReducer(
 
           if (!isNil(tileId)) {
             if (previousTile?.value === currentTile.value) {
+              newTiles[previousTile.id as string] = {
+                ...previousTile,
+                value: previousTile.value * 2,
+              };
               newTiles[tileId] = { ...currentTile, position: [x, newY + 1] };
               previousTile = undefined;
               continue;
@@ -124,6 +132,10 @@ export default function gameReducer(
 
           if (!isNil(tileId)) {
             if (previousTile?.value === currentTile.value) {
+              newTiles[previousTile.id as string] = {
+                ...previousTile,
+                value: previousTile.value * 2,
+              };
               newTiles[tileId] = { ...currentTile, position: [newX - 1, y] };
               previousTile = undefined;
               continue;
@@ -157,6 +169,10 @@ export default function gameReducer(
 
           if (!isNil(tileId)) {
             if (previousTile?.value === currentTile.value) {
+              newTiles[previousTile.id as string] = {
+                ...previousTile,
+                value: previousTile.value * 2,
+              };
               newTiles[tileId] = { ...currentTile, position: [newX + 1, y] };
               previousTile = undefined;
               continue;
