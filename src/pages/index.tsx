@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Board from "@/components/Board/Board";
+import Board from "@/components/board";
 
 export default function Home() {
   return (
