@@ -48,13 +48,37 @@ export default function Board() {
 
   /*
    * @notice: this is the initial state for the game
-   * @notice: this need to be randomized to create a different initial state for every player
    * @notice: this will not manage the randomness for the creation of new tiles after every move
    */
   useEffect(() => {
     if (initialized.current === false) {
-      dispatch({ type: "CREATE_TILE", tile: { position: [0, 1], value: 2 } });
-      dispatch({ type: "CREATE_TILE", tile: { position: [0, 2], value: 2 } });
+      // Generate all possible positions on the board
+      const allPositions: [number, number][] = [];
+      for (let x = 0; x < 4; x++) {
+        for (let y = 0; y < 4; y++) {
+          allPositions.push([x, y]);
+        }
+      }
+
+      // Shuffle the positions array
+      for (let i = allPositions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allPositions[i], allPositions[j]] = [allPositions[j], allPositions[i]];
+      }
+
+      // Take the first two positions
+      const position1 = allPositions[0];
+      const position2 = allPositions[1];
+
+      dispatch({
+        type: "CREATE_TILE",
+        tile: { position: position1, value: 2 },
+      });
+      dispatch({
+        type: "CREATE_TILE",
+        tile: { position: position2, value: 2 },
+      });
+
       initialized.current = true;
     }
   }, []);
