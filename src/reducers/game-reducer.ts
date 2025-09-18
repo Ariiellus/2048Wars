@@ -9,14 +9,17 @@ type State = {
   tilesByIds: string[];
   hasChanged: boolean;
   score: number;
+  status: "ongoing" | "WON" | "LOST";
 };
-type Action =
+export type Action =
   | { type: "CREATE_TILE"; tile: Tile }
   | { type: "MOVE_UP" }
   | { type: "MOVE_DOWN" }
   | { type: "MOVE_LEFT" }
   | { type: "MOVE_RIGHT" }
-  | { type: "CLEAN_UP" };
+  | { type: "CLEAN_UP" }
+  | { type: "RESET_GAME" }
+  | { type: "UPDATE_STATUS"; status: "WON" | "LOST" };
 
 function createBoard() {
   const board: string[][] = [];
@@ -33,6 +36,7 @@ export const initialState: State = {
   tilesByIds: [],
   hasChanged: false,
   score: 0,
+  status: "ongoing",
 };
 
 export default function gameReducer(
@@ -83,7 +87,7 @@ export default function gameReducer(
       const newBoard = createBoard();
       const newTiles: TileMap = {};
       let hasChanged = false;
-      let {score} = state;
+      let { score } = state;
 
       for (let x = 0; x < tileCountPerDimension; x++) {
         let newY = 0;
@@ -133,7 +137,7 @@ export default function gameReducer(
       const newBoard = createBoard();
       const newTiles: TileMap = {};
       let hasChanged = false;
-      let {score} = state;
+      let { score } = state;
 
       for (let x = 0; x < tileCountPerDimension; x++) {
         let newY = tileCountPerDimension - 1;
@@ -183,7 +187,7 @@ export default function gameReducer(
       const newBoard = createBoard();
       const newTiles: TileMap = {};
       let hasChanged = false;
-      let {score} = state;
+      let { score } = state;
 
       for (let y = 0; y < tileCountPerDimension; y++) {
         let newX = 0;
@@ -233,7 +237,7 @@ export default function gameReducer(
       const newBoard = createBoard();
       const newTiles: TileMap = {};
       let hasChanged = false;
-      let {score} = state;
+      let { score } = state;
 
       for (let y = 0; y < tileCountPerDimension; y++) {
         let newX = tileCountPerDimension - 1;
@@ -276,6 +280,20 @@ export default function gameReducer(
         tiles: newTiles,
         hasChanged,
         score,
+      };
+    }
+
+    case "RESET_GAME": {
+      return {
+        ...initialState,
+        hasChanged: true,
+      };
+    }
+
+    case "UPDATE_STATUS": {
+      return {
+        ...state,
+        status: action.status,
       };
     }
 

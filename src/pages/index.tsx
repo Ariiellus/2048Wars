@@ -17,7 +17,6 @@ export default function Home() {
         <Score />
       </header>
       <main>
-
         <Board />
       </main>
       <footer>Made with ❤️ by Ariiellus</footer>
