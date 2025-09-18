@@ -2,41 +2,32 @@ import styles from "@/styles/board.module.css";
 import Tile from "@/components/tile";
 import { useCallback, useContext, useEffect, useRef } from "react";
 import { Tile as TileModel } from "@/models/tile";
-import { moveAnimationDuration, mergeAnimationDuration } from "@constants";
 import { GameContext } from "@/context/game-context";
 
 export default function Board() {
-  const { appendRandomTile, getTiles, dispatch } = useContext(GameContext);
+  const { getTiles, dispatch } = useContext(GameContext);
   const initialized = useRef(false);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       event.preventDefault(); // prevents scrolling when using arrow keys
 
-      requestAnimationFrame(() => {
-        switch (event.code) {
-          case "ArrowUp":
-            dispatch({ type: "MOVE_UP" });
-            break;
-          case "ArrowDown":
-            dispatch({ type: "MOVE_DOWN" });
-            break;
-          case "ArrowLeft":
-            dispatch({ type: "MOVE_LEFT" });
-            break;
-          case "ArrowRight":
-            dispatch({ type: "MOVE_RIGHT" });
-            break;
-        }
-
-        // Clean up after animation completes and allow new moves
-        setTimeout(() => {
-          dispatch({ type: "CLEAN_UP" });
-          appendRandomTile();
-        }, mergeAnimationDuration);
-      });
+      switch (event.code) {
+        case "ArrowUp":
+          dispatch({ type: "MOVE_UP" });
+          break;
+        case "ArrowDown":
+          dispatch({ type: "MOVE_DOWN" });
+          break;
+        case "ArrowLeft":
+          dispatch({ type: "MOVE_LEFT" });
+          break;
+        case "ArrowRight":
+          dispatch({ type: "MOVE_RIGHT" });
+          break;
+      }
     },
-    [appendRandomTile, dispatch],
+    [dispatch],
   );
 
   const renderGrid = () => {
@@ -51,9 +42,9 @@ export default function Board() {
   };
 
   const renderTiles = () => {
-    return getTiles().map((tile: TileModel) => {
-      return <Tile key={`${tile.id}`} {...tile} />;
-    });
+    return getTiles().map((tile: TileModel) => (
+      <Tile key={`${tile.id}`} {...tile} />
+    ));
   };
 
   /*
@@ -101,13 +92,8 @@ export default function Board() {
     };
   }, [handleKeyDown]);
 
-  const boardStyle = {
-    "--move-duration": `${moveAnimationDuration}ms`,
-    "--merge-duration": `${mergeAnimationDuration}ms`,
-  } as React.CSSProperties;
-
   return (
-    <div className={styles.board} style={boardStyle}>
+    <div className={styles.board}>
       <div className={styles.tiles}>{renderTiles()}</div>
       <div className={styles.grid}>{renderGrid()}</div>
     </div>
