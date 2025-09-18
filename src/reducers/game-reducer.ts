@@ -3,8 +3,8 @@ import { uid } from "uid";
 import { tileCountPerDimension } from "@constants";
 import { flattenDeep, isNil } from "lodash";
 
-type State = { board: string[][]; tiles: TileMap };
-type Action =
+type State = { board: string[][]; tiles: TileMap; tilesByIds: string[] };
+export type Action =
   | { type: "CREATE_TILE"; tile: Tile }
   | { type: "MOVE_UP" }
   | { type: "MOVE_DOWN" }
@@ -21,7 +21,7 @@ export function createBoard() {
   return board;
 }
 
-export const initialState: State = { board: createBoard(), tiles: {} };
+export const initialState: State = { board: createBoard(), tiles: {}, tilesByIds: [] };
 
 export default function gameReducer(
   state: State = initialState,
@@ -47,6 +47,7 @@ export default function gameReducer(
       return {
         ...state,
         tiles: newTiles,
+        tilesByIds: Object.keys(newTiles)
       };
     }
 
@@ -59,7 +60,7 @@ export default function gameReducer(
       return {
         ...state,
         board: newBoard,
-        tiles: { ...state.tiles, [tileId]: { id: tileId, ...action.tile } },
+        tiles: { ...state.tiles, [tileId]: { id: tileId, ...action.tile } }, tilesByIds: [...state.tilesByIds, tileId]
       };
     }
 
@@ -81,7 +82,10 @@ export default function gameReducer(
                 ...previousTile,
                 value: previousTile.value * 2,
               };
-              newTiles[tileId] = { ...currentTile, position: [x, newY - 1] };
+              newTiles[tileId] = {
+                ...currentTile,
+                position: previousTile.position,
+              };
               previousTile = undefined;
               continue;
             }
@@ -99,6 +103,7 @@ export default function gameReducer(
         ...state,
         board: newBoard,
         tiles: newTiles,
+        tilesByIds: Object.keys(newTiles)
       };
     }
     case "MOVE_DOWN": {
@@ -119,7 +124,10 @@ export default function gameReducer(
                 ...previousTile,
                 value: previousTile.value * 2,
               };
-              newTiles[tileId] = { ...currentTile, position: [x, newY + 1] };
+              newTiles[tileId] = {
+                ...currentTile,
+                position: previousTile.position,
+              };
               previousTile = undefined;
               continue;
             }
@@ -137,6 +145,7 @@ export default function gameReducer(
         ...state,
         board: newBoard,
         tiles: newTiles,
+        tilesByIds: Object.keys(newTiles)
       };
     }
     case "MOVE_LEFT": {
@@ -157,7 +166,10 @@ export default function gameReducer(
                 ...previousTile,
                 value: previousTile.value * 2,
               };
-              newTiles[tileId] = { ...currentTile, position: [newX - 1, y] };
+              newTiles[tileId] = {
+                ...currentTile,
+                position: previousTile.position,
+              };
               previousTile = undefined;
               continue;
             }
@@ -175,6 +187,7 @@ export default function gameReducer(
         ...state,
         board: newBoard,
         tiles: newTiles,
+        tilesByIds: Object.keys(newTiles)
       };
     }
     case "MOVE_RIGHT": {
@@ -194,7 +207,10 @@ export default function gameReducer(
                 ...previousTile,
                 value: previousTile.value * 2,
               };
-              newTiles[tileId] = { ...currentTile, position: [newX + 1, y] };
+              newTiles[tileId] = {
+                ...currentTile,
+                position: previousTile.position,
+              };
               previousTile = undefined;
               continue;
             }
@@ -212,6 +228,7 @@ export default function gameReducer(
         ...state,
         board: newBoard,
         tiles: newTiles,
+        tilesByIds: Object.keys(newTiles)
       };
     }
 

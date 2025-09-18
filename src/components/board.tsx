@@ -1,33 +1,43 @@
 import styles from "@/styles/board.module.css";
 import Tile from "@/components/tile";
-import gameReducer, { initialState } from "@/reducers/game-reducer";
-import { useEffect, useReducer, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { Tile as TileModel } from "@/models/tile";
+import { moveAnimationDuration, mergeAnimationDuration } from "@constants";
+import { GameContext } from "@/context/game-context";
 
 export default function Board() {
-  const [gameState, dispatch] = useReducer(gameReducer, initialState);
+  const { appendRandomTile, getTiles, dispatch } = useContext(GameContext);
   const initialized = useRef(false);
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    event.preventDefault(); // prevents scrolling when using arrow keys
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      event.preventDefault(); // prevents scrolling when using arrow keys
 
-    switch (event.code) {
-      case "ArrowUp":
-        dispatch({ type: "MOVE_UP" });
-        break;
-      case "ArrowDown":
-        dispatch({ type: "MOVE_DOWN" });
-        break;
-      case "ArrowLeft":
-        dispatch({ type: "MOVE_LEFT" });
-        break;
-      case "ArrowRight":
-        dispatch({ type: "MOVE_RIGHT" });
-        break;
-    }
+      requestAnimationFrame(() => {
+        switch (event.code) {
+          case "ArrowUp":
+            dispatch({ type: "MOVE_UP" });
+            break;
+          case "ArrowDown":
+            dispatch({ type: "MOVE_DOWN" });
+            break;
+          case "ArrowLeft":
+            dispatch({ type: "MOVE_LEFT" });
+            break;
+          case "ArrowRight":
+            dispatch({ type: "MOVE_RIGHT" });
+            break;
+        }
 
-    dispatch({ type: "CLEAN_UP" });
-  };
+        // Clean up after animation completes and allow new moves
+        setTimeout(() => {
+          dispatch({ type: "CLEAN_UP" });
+          appendRandomTile();
+        }, mergeAnimationDuration);
+      });
+    },
+    [appendRandomTile, dispatch],
+  );
 
   const renderGrid = () => {
     const cells: React.ReactNode[] = [];
@@ -41,11 +51,9 @@ export default function Board() {
   };
 
   const renderTiles = () => {
-    return Object.values(gameState.tiles).map(
-      (tile: TileModel, index: number) => {
-        return <Tile key={`${index}`} {...tile} />;
-      },
-    );
+    return getTiles().map((tile: TileModel) => {
+      return <Tile key={`${tile.id}`} {...tile} />;
+    });
   };
 
   /*
@@ -83,7 +91,7 @@ export default function Board() {
 
       initialized.current = true;
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -91,10 +99,15 @@ export default function Board() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
+
+  const boardStyle = {
+    "--move-duration": `${moveAnimationDuration}ms`,
+    "--merge-duration": `${mergeAnimationDuration}ms`,
+  } as React.CSSProperties;
 
   return (
-    <div className={styles.board}>
+    <div className={styles.board} style={boardStyle}>
       <div className={styles.tiles}>{renderTiles()}</div>
       <div className={styles.grid}>{renderGrid()}</div>
     </div>

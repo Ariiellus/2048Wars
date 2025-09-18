@@ -10,4 +10,9 @@
   line-height: calc(var(--pixel-size) * 8);
   font-weight: bold;
   text-align: center;
+  transition-property: left, top, transform;
+  transition-duration:
+    var(--move-duration, 0.2s), var(--move-duration, 0.2s),
+    var(--merge-duration, 0.1s);
+  transition-timing-function: ease-in-out;
 }
