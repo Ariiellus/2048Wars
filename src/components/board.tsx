@@ -4,6 +4,7 @@ import { useCallback, useContext, useEffect, useRef } from "react";
 import { Tile as TileModel } from "@/models/tile";
 import { GameContext } from "@/context/game-context";
 import MobileSwiper, { SwipeInput } from "./mobile-swiper";
+import Splash from "./splash";
 
 export default function Board() {
   const { getTiles, moveTiles, startGame, status } = useContext(GameContext);
@@ -68,35 +69,12 @@ export default function Board() {
     ));
   };
 
-  /*
-   * @notice: this is the initial state for the game
-   * @notice: this will not manage the randomness for the creation of new tiles after every move
-   */
   useEffect(() => {
     if (initialized.current === false) {
-      // Generate all possible positions on the board
-      const allPositions: [number, number][] = [];
-      for (let x = 0; x < 4; x++) {
-        for (let y = 0; y < 4; y++) {
-          allPositions.push([x, y]);
-        }
-      }
-
-      // Shuffle the positions array
-      for (let i = allPositions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allPositions[i], allPositions[j]] = [allPositions[j], allPositions[i]];
-      }
-
-      // Take the first two positions
-      const position1 = allPositions[0];
-      const position2 = allPositions[1];
-
       startGame();
-
       initialized.current = true;
     }
-  }, [moveTiles]);
+  }, [startGame]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -109,6 +87,8 @@ export default function Board() {
   return (
     <MobileSwiper onSwipe={handleSwipe}>
       <div className={styles.board}>
+        {status === "WON" && <Splash heading="You won!" type="WON" />}
+        {status === "LOST" && <Splash heading="You lost!" type="LOST" />}
         <div className={styles.tiles}>{renderTiles()}</div>
         <div className={styles.grid}>{renderGrid()}</div>
       </div>
