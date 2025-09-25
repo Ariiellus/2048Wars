@@ -9,7 +9,7 @@ type MoveDirection = "MOVE_UP" | "MOVE_DOWN" | "MOVE_LEFT" | "MOVE_RIGHT";
 export const GameContext = createContext({
   score: 0,
   status: "ONGOING",
-  moveTiles: (_: MoveDirection) => {},
+  moveTiles: (_direction: MoveDirection) => {},
   getTiles: () => [] as Tile[],
   startGame: () => {},
 });
@@ -17,7 +17,7 @@ export const GameContext = createContext({
 export default function GameProvider({ children }: PropsWithChildren) {
   const [gameState, dispatch] = useReducer(gameReducer, initialState);
 
-  const getEmptyCells = () => {
+  const getEmptyCells = useCallback(() => {
     const results: [number, number][] = [];
 
     for (let x = 0; x < tileCountPerDimension; x++) {
@@ -28,9 +28,9 @@ export default function GameProvider({ children }: PropsWithChildren) {
       }
     }
     return results;
-  };
+  }, [gameState.board]);
 
-  const appendRandomTile = () => {
+  const appendRandomTile = useCallback(() => {
     const emptyCells = getEmptyCells();
     if (emptyCells.length > 0) {
       const cellIndex = Math.floor(Math.random() * emptyCells.length);
@@ -40,14 +40,17 @@ export default function GameProvider({ children }: PropsWithChildren) {
       };
       dispatch({ type: "CREATE_TILE", tile: newTile });
     }
-  };
+  }, [getEmptyCells]);
 
   const getTiles = () => {
     return gameState.tilesByIds.map(tileId => gameState.tiles[tileId]);
   };
 
   const moveTiles = useCallback(
-    throttle((type: MoveDirection) => dispatch({ type }), mergeAnimationDuration * 1.05, { trailing: false }),
+    (type: MoveDirection) => {
+      const throttledDispatch = throttle(() => dispatch({ type }), mergeAnimationDuration * 1.05, { trailing: false });
+      throttledDispatch();
+    },
     [dispatch],
   );
 
@@ -78,7 +81,7 @@ export default function GameProvider({ children }: PropsWithChildren) {
     dispatch({ type: "CREATE_TILE", tile: { position: position2, value: 2 } });
   };
 
-  const checkGameState = () => {
+  const checkGameState = useCallback(() => {
     const isWon = Object.values(gameState.tiles).filter(t => t.value === gameWinTileValue).length > 0;
 
     if (isWon) {
@@ -106,7 +109,7 @@ export default function GameProvider({ children }: PropsWithChildren) {
     }
 
     dispatch({ type: "UPDATE_STATUS", status: "LOST" });
-  };
+  }, [gameState]);
 
   useEffect(() => {
     if (gameState.hasChanged) {
@@ -115,13 +118,13 @@ export default function GameProvider({ children }: PropsWithChildren) {
         appendRandomTile();
       }, mergeAnimationDuration);
     }
-  }, [gameState.hasChanged]);
+  }, [gameState.hasChanged, appendRandomTile]);
 
   useEffect(() => {
     if (!gameState.hasChanged) {
       checkGameState();
     }
-  }, [gameState.hasChanged]);
+  }, [gameState.hasChanged, checkGameState]);
 
   return (
     <GameContext.Provider
