@@ -2,7 +2,7 @@ import { PropsWithChildren, createContext, useCallback, useEffect, useReducer } 
 import { gameWinTileValue, mergeAnimationDuration, tileCountPerDimension } from "../constants";
 import { Tile } from "../models/tile";
 import gameReducer, { initialState } from "../reducers/game-reducer";
-import { isNil, throttle } from "lodash";
+import { isNil } from "lodash";
 
 type MoveDirection = "MOVE_UP" | "MOVE_DOWN" | "MOVE_LEFT" | "MOVE_RIGHT";
 
@@ -43,15 +43,17 @@ export default function GameProvider({ children }: PropsWithChildren) {
   }, [getEmptyCells]);
 
   const getTiles = () => {
-    return gameState.tilesByIds.map(tileId => gameState.tiles[tileId]);
+    return gameState.tilesByIds.map(tileId => gameState.tiles[tileId]).filter(Boolean);
   };
 
   const moveTiles = useCallback(
     (type: MoveDirection) => {
-      const throttledDispatch = throttle(() => dispatch({ type }), mergeAnimationDuration * 1.05, { trailing: false });
-      throttledDispatch();
+      // Only allow moves if no animation is in progress
+      if (!gameState.hasChanged) {
+        dispatch({ type });
+      }
     },
-    [dispatch],
+    [dispatch, gameState.hasChanged],
   );
 
   /*
@@ -94,15 +96,15 @@ export default function GameProvider({ children }: PropsWithChildren) {
     const maxIndex = tileCountPerDimension - 1;
     for (let x = 0; x < maxIndex; x += 1) {
       for (let y = 0; y < maxIndex; y += 1) {
-        if (isNil(gameState.board[x][y]) || isNil(gameState.board[x + 1][y]) || isNil(gameState.board[x][y + 1])) {
+        if (isNil(gameState.board[y][x]) || isNil(gameState.board[y][x + 1]) || isNil(gameState.board[y + 1][x])) {
           return;
         }
 
-        if (tiles[board[x][y]].value === tiles[board[x + 1][y]].value) {
+        if (tiles[board[y][x]].value === tiles[board[y][x + 1]].value) {
           return;
         }
 
-        if (tiles[board[x][y]].value === tiles[board[x][y + 1]].value) {
+        if (tiles[board[y][x]].value === tiles[board[y + 1][x]].value) {
           return;
         }
       }

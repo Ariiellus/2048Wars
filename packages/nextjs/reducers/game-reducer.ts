@@ -268,7 +268,7 @@ export default function gameReducer(state: State = initialState, action: Action)
 
             newBoard[y][newX] = tileId;
             newTiles[tileId] = {
-              ...state.tiles[tileId],
+              ...currentTile,
               position: [newX, y],
             };
             previousTile = newTiles[tileId];
