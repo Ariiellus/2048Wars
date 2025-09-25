@@ -1,4 +1,4 @@
-import Board from "../../components/board";
+import Board from "../../components/2048components/board";
 import GameProvider from "../../context/game-context";
 import { render } from "@testing-library/react";
 

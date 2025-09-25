@@ -1,5 +1,4 @@
 import { useReducer } from "react";
-import { Tile } from "../../models/tile";
 import gameReducer, { initialState } from "../../reducers/game-reducer";
 import { act, renderHook } from "@testing-library/react";
 import { isNil } from "lodash";
@@ -7,12 +6,12 @@ import { isNil } from "lodash";
 describe("gameReducer", () => {
   describe("CLEAN_UP", () => {
     it("should remove one of the tiles that have been merged", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 0],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [0, 3],
         value: 2,
       };
@@ -40,7 +39,7 @@ describe("gameReducer", () => {
 
   describe("create_tile", () => {
     it("should create a new tile", () => {
-      const tile: Tile = {
+      const tile = {
         position: [0, 0],
         value: 2,
       };
@@ -61,12 +60,12 @@ describe("gameReducer", () => {
 
   describe("move_up", () => {
     it("should move the tiles to the top of the board", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [1, 3],
         value: 2,
       };
@@ -95,12 +94,12 @@ describe("gameReducer", () => {
     });
 
     it("should merge tiles with the same value", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [0, 3],
         value: 2,
       };
@@ -131,12 +130,12 @@ describe("gameReducer", () => {
 
   describe("move_down", () => {
     it("should move the tiles to the top of the board", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [0, 3],
         value: 2,
       };
@@ -165,12 +164,12 @@ describe("gameReducer", () => {
     });
 
     it("should merge tiles with the same value", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [0, 3],
         value: 2,
       };
@@ -199,12 +198,12 @@ describe("gameReducer", () => {
     });
 
     it("should keep the original order of tiles (regression test)", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 4,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [0, 3],
         value: 2,
       };
@@ -235,12 +234,12 @@ describe("gameReducer", () => {
 
   describe("move_left", () => {
     it("should move the tiles to the left of the board", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [1, 3],
         value: 2,
       };
@@ -267,12 +266,12 @@ describe("gameReducer", () => {
     });
 
     it("should merge tiles with the same value", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [3, 1],
         value: 2,
       };
@@ -303,12 +302,12 @@ describe("gameReducer", () => {
 
   describe("move_right", () => {
     it("should move the tiles to the right of the board", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [1, 3],
         value: 2,
       };
@@ -337,12 +336,12 @@ describe("gameReducer", () => {
     });
 
     it("should merge tiles with the same value", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 2,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [3, 1],
         value: 2,
       };
@@ -371,12 +370,12 @@ describe("gameReducer", () => {
     });
 
     it("should keep the original order of tiles (regression test)", () => {
-      const tile1: Tile = {
+      const tile1 = {
         position: [0, 1],
         value: 4,
       };
 
-      const tile2: Tile = {
+      const tile2 = {
         position: [3, 1],
         value: 2,
       };

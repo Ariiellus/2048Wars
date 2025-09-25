@@ -1,6 +1,6 @@
 export type Tile = {
   id?: string;
-  position: [number, number];
+  position: [number, number] | number[];
   value: number;
 };
 

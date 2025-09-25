@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useCallback, useEffect, useReducer } from "react";
+import { PropsWithChildren, createContext, useCallback, useEffect, useReducer, useRef } from "react";
 import { gameWinTileValue, mergeAnimationDuration, tileCountPerDimension } from "../constants";
 import { Tile } from "../models/tile";
 import gameReducer, { initialState } from "../reducers/game-reducer";
@@ -16,6 +16,7 @@ export const GameContext = createContext({
 
 export default function GameProvider({ children }: PropsWithChildren) {
   const [gameState, dispatch] = useReducer(gameReducer, initialState);
+  const gameStateRef = useRef(gameState);
 
   const getEmptyCells = useCallback(() => {
     const results: [number, number][] = [];
@@ -83,35 +84,44 @@ export default function GameProvider({ children }: PropsWithChildren) {
     dispatch({ type: "CREATE_TILE", tile: { position: position2, value: 2 } });
   };
 
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
   const checkGameState = useCallback(() => {
-    const isWon = Object.values(gameState.tiles).filter(t => t.value === gameWinTileValue).length > 0;
+    const currentState = gameStateRef.current;
+    const isWon = Object.values(currentState.tiles).filter(t => t.value === gameWinTileValue).length > 0;
 
     if (isWon) {
       dispatch({ type: "UPDATE_STATUS", status: "WON" });
       return;
     }
 
-    const { tiles, board } = gameState;
+    const { tiles, board } = currentState;
 
-    const maxIndex = tileCountPerDimension - 1;
-    for (let x = 0; x < maxIndex; x += 1) {
-      for (let y = 0; y < maxIndex; y += 1) {
-        if (isNil(gameState.board[y][x]) || isNil(gameState.board[y][x + 1]) || isNil(gameState.board[y + 1][x])) {
-          return;
-        }
-
-        if (tiles[board[y][x]].value === tiles[board[y][x + 1]].value) {
-          return;
-        }
-
-        if (tiles[board[y][x]].value === tiles[board[y + 1][x]].value) {
+    // Check if there are any empty cells - if yes, game continues
+    for (let x = 0; x < tileCountPerDimension; x++) {
+      for (let y = 0; y < tileCountPerDimension; y++) {
+        if (isNil(board[y][x])) {
           return;
         }
       }
     }
 
+    // Board is full, check if any merges are possible
+    const maxIndex = tileCountPerDimension - 1;
+    for (let x = 0; x < tileCountPerDimension; x++) {
+      for (let y = 0; y < tileCountPerDimension; y++) {
+        if (x < maxIndex && tiles[board[y][x]].value === tiles[board[y][x + 1]].value) {
+          return;
+        }
+        if (y < maxIndex && tiles[board[y][x]].value === tiles[board[y + 1][x]].value) {
+          return;
+        }
+      }
+    }
     dispatch({ type: "UPDATE_STATUS", status: "LOST" });
-  }, [gameState]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (gameState.hasChanged) {
