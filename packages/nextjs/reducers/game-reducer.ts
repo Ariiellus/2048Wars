@@ -12,6 +12,7 @@ type State = {
   hasChanged: boolean;
   score: number;
   status: GameStatus;
+  positionId: number;
 };
 type Action =
   | { type: "CREATE_TILE"; tile: Tile }
@@ -40,6 +41,7 @@ export const initialState: State = {
   hasChanged: false,
   score: 0,
   status: "ONGOING",
+  positionId: 1,
 };
 
 export default function gameReducer(state: State = initialState, action: Action) {
@@ -132,6 +134,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         tiles: newTiles,
         hasChanged,
         score,
+        positionId: hasChanged ? state.positionId + 1 : state.positionId,
       };
     }
     case "MOVE_DOWN": {
@@ -183,6 +186,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         tiles: newTiles,
         hasChanged,
         score,
+        positionId: hasChanged ? state.positionId + 1 : state.positionId,
       };
     }
     case "MOVE_LEFT": {
@@ -234,6 +238,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         tiles: newTiles,
         hasChanged,
         score,
+        positionId: hasChanged ? state.positionId + 1 : state.positionId,
       };
     }
     case "MOVE_RIGHT": {
@@ -285,6 +290,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         tiles: newTiles,
         hasChanged,
         score,
+        positionId: hasChanged ? state.positionId + 1 : state.positionId,
       };
     }
     case "RESET_GAME":

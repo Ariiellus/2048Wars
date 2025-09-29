@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.30;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -12,7 +12,7 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * @notice This first version only takes entry fee, check if player complete the game and add winners to a list
  */
 
-contract EntryFee is Ownable, ReentrancyGuard {
+contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
   uint256 public entryFee;
   mapping(address => bool) public isPlayer;
   mapping(address => bool) public isWinner;

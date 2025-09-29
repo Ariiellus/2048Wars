@@ -29,6 +29,16 @@
   bottom: 0;
 }
 
+.positionId {
+  position: absolute;
+  top: calc(var(--pixel-size) * -3);
+  left: 0;
+  font-size: calc(var(--pixel-size) * 2);
+  font-weight: bold;
+  color: var(--text-color);
+  z-index: 3;
+}
+
 @media (min-width: 512px) {
   .board {
     width: calc(var(--pixel-size) * 12.5 * 4 + var(--pixel-size) * 10);

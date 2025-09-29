@@ -7,7 +7,7 @@ import { Tile as TileModel } from "~~/models/tile";
 import styles from "~~/styles/2048styles/board.module.css";
 
 export default function Board() {
-  const { getTiles, moveTiles, startGame, status } = useContext(GameContext);
+  const { getTiles, moveTiles, startGame, status, positionId } = useContext(GameContext);
   const initialized = useRef(false);
 
   const handleKeyDown = useCallback(
@@ -87,6 +87,7 @@ export default function Board() {
       <div className={styles.board}>
         {status === "WON" && <Splash heading="You won!" type="WON" />}
         {status === "LOST" && <Splash heading="You lost!" type="LOST" />}
+        <div className={styles.positionId}>Position: {positionId}</div>
         <div className={styles.tiles}>{renderTiles()}</div>
         <div className={styles.grid}>{renderGrid()}</div>
       </div>

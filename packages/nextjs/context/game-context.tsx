@@ -9,6 +9,7 @@ type MoveDirection = "MOVE_UP" | "MOVE_DOWN" | "MOVE_LEFT" | "MOVE_RIGHT";
 export const GameContext = createContext({
   score: 0,
   status: "ONGOING",
+  positionId: 1,
   moveTiles: (_direction: MoveDirection) => {},
   getTiles: () => [] as Tile[],
   startGame: () => {},
@@ -143,6 +144,7 @@ export default function GameProvider({ children }: PropsWithChildren) {
       value={{
         score: gameState.score,
         status: gameState.status,
+        positionId: gameState.positionId,
         getTiles,
         moveTiles,
         startGame,
