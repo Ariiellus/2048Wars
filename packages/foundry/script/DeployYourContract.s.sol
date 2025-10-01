@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./DeployHelpers.s.sol";
-import "../contracts/YourContract.sol";
+import { Play2048Wars } from "../contracts/Play2048Wars.sol";
 
 /**
  * @notice Deploy script for YourContract contract
@@ -25,6 +25,7 @@ contract DeployYourContract is ScaffoldETHDeploy {
      *      - Export contract addresses & ABIs to `nextjs` packages
      */
     function run() external ScaffoldEthDeployerRunner {
-        new YourContract(deployer);
+        Play2048Wars game = new Play2048Wars(0.001 ether, deployer);
+        deployments.push(Deployment({ name: "Play2048Wars", addr: address(game) }));
     }
 }

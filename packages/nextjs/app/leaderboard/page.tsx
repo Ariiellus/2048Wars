@@ -16,26 +16,25 @@ const Leaderboard: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
 
-  const { data: topScores } = useScaffoldReadContract({
-    contractName: "GameLeaderboard",
-    functionName: "getTopScores",
-    args: [10n], // Get top 10 scores
+  const { data: winnersList } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getAllWinners",
   });
 
   // Get player stats if connected
-  const { data: playerStats } = useScaffoldReadContract({
-    contractName: "GameLeaderboard",
-    functionName: "getPlayerStats",
-    args: connectedAddress ? [connectedAddress] : undefined,
+  const { data: playerGame } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getPlayerGame",
+    args: connectedAddress ? [connectedAddress] : [""],
   });
 
   useEffect(() => {
-    if (topScores && topScores.length > 0) {
-      // Convert BigInt values to numbers and format the data
-      const formattedData: LeaderboardEntry[] = topScores.map((entry: any) => ({
-        player: entry.player,
-        score: Number(entry.score),
-        timestamp: Number(entry.timestamp) * 1000, // Convert to milliseconds
+    if (winnersList && winnersList.length > 0) {
+      // Convert winners list to leaderboard format
+      const formattedData: LeaderboardEntry[] = winnersList.map((winner: string, index: number) => ({
+        player: winner,
+        score: 2048, // Winners have achieved 2048
+        timestamp: Date.now() - index * 3600000, // Mock timestamp
       }));
       setLeaderboardData(formattedData);
     } else {
@@ -49,7 +48,7 @@ const Leaderboard: NextPage = () => {
       ];
       setLeaderboardData(mockData);
     }
-  }, [topScores]);
+  }, [winnersList]);
 
   const formatTimeAgo = (timestamp: number) => {
     const now = Date.now();
@@ -113,18 +112,18 @@ const Leaderboard: NextPage = () => {
           </div>
         </div>
 
-        {connectedAddress && playerStats && (
+        {connectedAddress && playerGame && (
           <div className="mt-8">
             <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Stats</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{Number(playerStats[0]).toLocaleString()}</div>
-                  <div className="text-sm text-gray-600">Best Score</div>
+                  <div className="text-2xl font-bold text-green-600">{Number(playerGame.score).toLocaleString()}</div>
+                  <div className="text-sm text-gray-600">Current Score</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{Number(playerStats[1])}</div>
-                  <div className="text-sm text-gray-600">Games Played</div>
+                  <div className="text-2xl font-bold text-blue-600">{Number(playerGame.movesPlayed)}</div>
+                  <div className="text-sm text-gray-600">Moves Played</div>
                 </div>
               </div>
             </div>

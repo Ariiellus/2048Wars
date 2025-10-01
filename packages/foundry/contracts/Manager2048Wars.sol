@@ -9,10 +9,9 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * @notice This contract is used to manage the entrance and distribute funds to winners
  * @notice 50% of entrance fees goes to a pool that is distributed to winners each week
  * @notice 50% remain for the next round
- * @notice This first version only takes entry fee, check if player complete the game and add winners to a list
  */
 
-contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
+contract Manager2048Wars is Ownable, ReentrancyGuard {
   uint256 public entryFee;
   mapping(address => bool) public isPlayer;
   mapping(address => bool) public isWinner;
@@ -26,14 +25,10 @@ contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
 
   uint256 public currentRound;
   uint256 public nextRoundStart;
-  uint256 public currentRoundPool;
-  uint256 public nextRoundPool;
 
   constructor(uint256 _entryFee, address _owner) Ownable(_owner) {
-    entryFee = _entryFee;
-    nextRoundStart = block.timestamp + 1 weeks;
-    currentRoundPool = 0;
-    nextRoundPool = 0;
+    entryFee = _entryFee; // 0.001 ether per game
+    nextRoundStart = block.timestamp + 1 weeks; // each round lasts 1 week
     currentRound = 1;
   }
 
@@ -48,7 +43,7 @@ contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
    * @notice Round start only after funds are distributed to the winners of the previous round
    * @notice First user to enter game call this function
    */
-  function startNewRound() public {
+  function startNewRound() internal {
     require(block.timestamp > nextRoundStart, "Next round not started");
     require(winnersList.length > 0, "No winners to distribute to");
 
@@ -57,16 +52,16 @@ contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
 
     nextRoundStart = block.timestamp + 1 weeks;
     currentRound++;
-    currentRoundPool = nextRoundPool;
-    nextRoundPool = 0;
     emit NewRoundStarted();
   }
 
   /**
-   * @notice This function will be more expensive to call if the current round has not started
+   * @notice This function will be more expensive the first time it is called after a new round has started
    */
   function enterGame() public payable {
+    require(!isPlayer[msg.sender], "You already entered the game");
     require(!isWinner[msg.sender], "You already won, wait for next round");
+
     require(msg.value == entryFee, "Invalid entry fee");
 
     if (getTimeRemainingOfCurrentRound() == 0) {
@@ -96,6 +91,10 @@ contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
 
   /// Pool Distribution functions
 
+  /**
+   * @notice Distribute the pool to the winners of the current round
+   * @notice First player of each round will distribute the pool
+   */
   function distributePool() internal nonReentrant {
     require(getTimeRemainingOfCurrentRound() == 0, "Round not finished");
     require(winnersList.length > 0, "No winners to distribute to");
@@ -110,6 +109,9 @@ contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
     restartMappings();
   }
 
+  /**
+   * @notice Clear all the data of the current round
+   */
   function restartMappings() internal {
     for (uint256 i = 0; i < winnersList.length; i++) {
       isWinner[winnersList[i]] = false;
@@ -141,15 +143,6 @@ contract TwentyFourEightWarsManager is Ownable, ReentrancyGuard {
 
   function getNextRoundPool() public view returns (uint256) {
     return address(this).balance / 2; // In the future add creator fee
-  }
-
-  function getTopTenWinners() public view returns (address[] memory) {
-    uint256 count = winnersList.length < 10 ? winnersList.length : 10;
-    address[] memory winners = new address[](count);
-    for (uint256 i = 0; i < count; i++) {
-      winners[i] = winnersList[i];
-    }
-    return winners;
   }
 
   function getAllWinners() public view returns (address[] memory) {
