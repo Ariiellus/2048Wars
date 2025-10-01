@@ -87,7 +87,6 @@ export default function Board() {
       <div className={styles.board}>
         {status === "WON" && <Splash heading="You won!" type="WON" />}
         {status === "LOST" && <Splash heading="You lost!" type="LOST" />}
-        <div className={styles.positionId}>Position: {positionId}</div>
         <div className={styles.tiles}>{renderTiles()}</div>
         <div className={styles.grid}>{renderGrid()}</div>
       </div>
