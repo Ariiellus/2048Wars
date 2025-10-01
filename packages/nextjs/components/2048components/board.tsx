@@ -7,7 +7,7 @@ import { Tile as TileModel } from "~~/models/tile";
 import styles from "~~/styles/2048styles/board.module.css";
 
 export default function Board() {
-  const { getTiles, moveTiles, startGame, status, positionId } = useContext(GameContext);
+  const { getTiles, moveTiles, startGame, status } = useContext(GameContext);
   const initialized = useRef(false);
 
   const handleKeyDown = useCallback(
