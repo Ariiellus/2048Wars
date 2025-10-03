@@ -1,4 +1,5 @@
 import "@rainbow-me/rainbowkit/styles.css";
+import { FarcasterProvider } from "~~/components/Farcaster-provider";
 import { ScaffoldEthAppWithProviders } from "~~/components/ScaffoldEthAppWithProviders";
 import { ThemeProvider } from "~~/components/ThemeProvider";
 import "~~/styles/globals.css";
@@ -14,7 +15,9 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     <html suppressHydrationWarning className={``}>
       <body>
         <ThemeProvider enableSystem forcedTheme="light">
-          <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
+          <FarcasterProvider>
+            <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
+          </FarcasterProvider>
         </ThemeProvider>
       </body>
     </html>

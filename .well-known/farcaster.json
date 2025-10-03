@@ -1,0 +1,13 @@
+{
+  "frame": {
+    "name": "2048Wars!",
+    "version": "1",
+    "iconUrl": "https://2048-wars.vercel.app/logo.svg",
+    "homeUrl": "https://2048-wars.vercel.app/",
+    "subtitle": "2048wars",
+    "description": "2048wars",
+    "primaryCategory": "games",
+    "splashImageUrl": "https://2048-wars.vercel.app/logo.svg",
+    "splashBackgroundColor": "#6200ea"
+  }
+}
