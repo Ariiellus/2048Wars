@@ -7,7 +7,7 @@ import { BuidlGuidlLogo } from "~~/components/assets/BuidlGuidlLogo";
  */
 export const Footer = () => {
   return (
-    <div className="min-h-0 py-5 px-1 mb-11 lg:mb-0">
+    <div className="min-h-0 px-1 mb-2 lg:mb-0">
       <div className="w-full">
         <ul className="menu menu-horizontal w-full">
           <div className="flex justify-center items-center gap-2 text-sm w-full">
@@ -18,7 +18,7 @@ export const Footer = () => {
             </div>
             <span>·</span>
             <div className="flex justify-center items-center gap-2">
-              <p className="m-0 text-center">
+              <p className="text-center">
                 Built with <HeartIcon className="inline-block h-4 w-4" /> by
               </p>
               <a
@@ -27,7 +27,6 @@ export const Footer = () => {
                 target="_blank"
                 rel="noreferrer"
               >
-                <BuidlGuidlLogo className="w-3 h-5 pb-1" />
                 <span className="link">Ariiellus</span>
               </a>
             </div>

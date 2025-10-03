@@ -1,5 +1,6 @@
 "use client";
 
+import Moves from "../components/2048components/moves";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import Board from "~~/components/2048components/board";
@@ -12,21 +13,23 @@ const Home: NextPage = () => {
 
   return (
     <GameProvider>
-      <div className="flex flex-col py-10">
-        <div className="px-5 w-full max-w-md mx-auto">
+      <div className="flex flex-col py-2">
+        <div className="   w-full max-w-md mx-auto">
           <header className="text-center mb-4">
-            <h1>
-              <span className="block text-2xl mb-2">Welcome to</span>
-              <span className="block text-4xl font-bold">2048Wars!</span>
-            </h1>
+            <h2>
+              <span className="block text-2xl font-bold">Welcome to 2048Wars!</span>
+            </h2>
           </header>
           <main>
-            <Score />
+            <div className="grid grid-cols-2 gap-4">
+              <Moves />
+              <Score />
+            </div>
             <div className="flex justify-center mt-4">
               <Board />
             </div>
           </main>
-          <div className="text-center mt-4 text-sm text-gray-600">
+          <div className="text-center mt-2 text-sm text-gray-600">
             <p className="font-bold">Player: </p>
             {connectedAddress ? connectedAddress : "Not connected"}
           </div>

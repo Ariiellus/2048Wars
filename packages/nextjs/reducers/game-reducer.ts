@@ -11,6 +11,7 @@ type State = {
   tilesByIds: string[];
   hasChanged: boolean;
   score: number;
+  moves: number;
   status: GameStatus;
   positionId: number;
 };
@@ -40,6 +41,7 @@ export const initialState: State = {
   tilesByIds: [],
   hasChanged: false,
   score: 0,
+  moves: 0,
   status: "ONGOING",
   positionId: 1,
 };
@@ -64,6 +66,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         tiles: newTiles,
         tilesByIds: Object.keys(newTiles),
         hasChanged: false,
+        moves: state.moves,
       };
     }
     case "CREATE_TILE": {
@@ -83,6 +86,7 @@ export default function gameReducer(state: State = initialState, action: Action)
           },
         },
         tilesByIds: [...state.tilesByIds, tileId],
+        moves: state.moves,
       };
     }
     case "MOVE_UP": {
@@ -135,6 +139,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         hasChanged,
         score,
         positionId: hasChanged ? state.positionId + 1 : state.positionId,
+        moves: hasChanged ? state.moves + 1 : state.moves,
       };
     }
     case "MOVE_DOWN": {
@@ -187,6 +192,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         hasChanged,
         score,
         positionId: hasChanged ? state.positionId + 1 : state.positionId,
+        moves: hasChanged ? state.moves + 1 : state.moves,
       };
     }
     case "MOVE_LEFT": {
@@ -239,6 +245,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         hasChanged,
         score,
         positionId: hasChanged ? state.positionId + 1 : state.positionId,
+        moves: hasChanged ? state.moves + 1 : state.moves,
       };
     }
     case "MOVE_RIGHT": {
@@ -291,6 +298,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         hasChanged,
         score,
         positionId: hasChanged ? state.positionId + 1 : state.positionId,
+        moves: hasChanged ? state.moves + 1 : state.moves,
       };
     }
     case "RESET_GAME":

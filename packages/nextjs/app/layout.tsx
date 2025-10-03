@@ -7,7 +7,7 @@ import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
 export const metadata = getMetadata({
   title: "2048Wars!",
-  description: "Built with 🏗 Scaffold-ETH 2",
+  description: "Reach 2048, win rewards",
   other: {
     "fc:miniapp": JSON.stringify({
       version: "1",
@@ -18,7 +18,7 @@ export const metadata = getMetadata({
           type: "launch_frame",
           name: "2048Wars!",
           url: "https://2048-wars.vercel.app/",
-          splashImageUrl: "https://2048-wars.vercel.app/logo.svg",
+          splashImageUrl: "https://2048-wars.vercel.app/2048Wars-Logo.png",
           splashBackgroundColor: "#6200ea",
         },
       },

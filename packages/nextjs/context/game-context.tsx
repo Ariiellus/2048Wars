@@ -8,6 +8,7 @@ type MoveDirection = "MOVE_UP" | "MOVE_DOWN" | "MOVE_LEFT" | "MOVE_RIGHT";
 
 export const GameContext = createContext({
   score: 0,
+  moves: 0,
   status: "ONGOING",
   positionId: 1,
   moveTiles: (_direction: MoveDirection) => {},
@@ -143,6 +144,7 @@ export default function GameProvider({ children }: PropsWithChildren) {
     <GameContext.Provider
       value={{
         score: gameState.score,
+        moves: gameState.moves,
         status: gameState.status,
         positionId: gameState.positionId,
         getTiles,

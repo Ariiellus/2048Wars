@@ -1,4 +1,4 @@
-.score {
+.score, .moves {
   background: var(--secondary-background);
   border: calc(var(--pixel-size) * 0.5) solid var(--secondary-background);
   border-radius: calc(var(--pixel-size) * 0.75);
@@ -10,19 +10,19 @@
   text-transform: uppercase;
 }
 
-.score > div {
+.score > div, .moves > div {
   font-size: calc(var(--pixel-size) * 2.5);
   color: var(--score-text-color);
 }
 
 @media (min-width: 512px) {
-  .score {
+  .score, .moves {
     border: calc(var(--pixel-size) * 1) solid var(--secondary-background);
     font-size: calc(var(--pixel-size) * 2);
     line-height: calc(var(--pixel-size) * 3.5);
   }
 
-  .score > div {
+  .score > div, .moves > div {
     font-size: calc(var(--pixel-size) * 3.5);
   }
 }
