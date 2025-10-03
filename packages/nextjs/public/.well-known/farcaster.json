@@ -12,8 +12,8 @@
     "webhookUrl": "https://api.farcaster.xyz/miniapps/hosted-manifest/0199aae3-c072-79f2-0f7b-f1c828a13fcc"
   },
   "accountAssociation": {
-    "header": "",
-    "payload": "",
-    "signature": ""
+    "header": "eyJmaWQiOjQxNDU3MCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDlERDNmNDk2YTAyOGQxQTVFMzFmMjM5MTNGMzdCZjQ2QUMxQjY0QTcifQ",
+    "payload": "eyJkb21haW4iOiIyMDQ4LXdhcnMudmVyY2VsLmFwcCJ9",
+    "signature": "MHg3Yzc1MGNhMjdlZGZlZjhhM2M3N2M2OWY2YjgwZmM3YWYwMzg0ZjhlYzQxOWU2M2VmYTZhYjY4ZTgzMTQ4MTI2MWFjOWY4OWU4ZGM5OTc5MTJkNjY3NjI4MmEwODUyZjllNWI3NWNiNzFmZjE2MTQ1MzUzZmQyNWJiZGIzM2JlZjFj"
   }
 }
