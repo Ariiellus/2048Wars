@@ -9,10 +9,12 @@ export const getMetadata = ({
   title,
   description,
   imageRelativePath = "/thumbnail.jpg",
+  other,
 }: {
   title: string;
   description: string;
   imageRelativePath?: string;
+  other?: Record<string, string>;
 }): Metadata => {
   const imageUrl = `${baseUrl}${imageRelativePath}`;
 
@@ -52,5 +54,6 @@ export const getMetadata = ({
         },
       ],
     },
+    ...(other && { other }),
   };
 };
