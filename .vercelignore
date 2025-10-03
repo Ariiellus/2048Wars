@@ -1,0 +1,25 @@
+# Local blockchain development files
+packages/foundry/broadcast/
+packages/foundry/cache/
+packages/foundry/deployments/
+packages/foundry/out/
+packages/foundry/lib/
+packages/foundry/node_modules/
+
+# Chain-related files
+*.chain
+*.chain.log
+*.chain.pid
+
+# Local development files
+.DS_Store
+.env.local
+.env.development.local
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
