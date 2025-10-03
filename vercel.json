@@ -1,6 +1,9 @@
 {
   "buildCommand": "yarn vercel-build",
-  "installCommand": "yarn install",
+  "installCommand": "yarn install --ignore-scripts",
   "outputDirectory": "packages/nextjs/.next",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "VERCEL": "1"
+  }
 }

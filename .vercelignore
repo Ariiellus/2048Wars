@@ -6,6 +6,12 @@ packages/foundry/out/
 packages/foundry/lib/
 packages/foundry/node_modules/
 
+# Deployment-related files
+packages/foundry/script/
+packages/foundry/Makefile
+packages/foundry/foundry.toml
+packages/foundry/remappings.txt
+
 # Chain-related files
 *.chain
 *.chain.log
