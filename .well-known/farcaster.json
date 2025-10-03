@@ -4,10 +4,16 @@
     "version": "1",
     "iconUrl": "https://2048-wars.vercel.app/logo.svg",
     "homeUrl": "https://2048-wars.vercel.app/",
+    "splashImageUrl": "https://2048-wars.vercel.app/logo.svg",
+    "splashBackgroundColor": "#6200ea",
     "subtitle": "2048wars",
     "description": "2048wars",
     "primaryCategory": "games",
-    "splashImageUrl": "https://2048-wars.vercel.app/logo.svg",
-    "splashBackgroundColor": "#6200ea"
+    "webhookUrl": "https://api.farcaster.xyz/miniapps/hosted-manifest/0199aae3-c072-79f2-0f7b-f1c828a13fcc"
+  },
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
   }
 }
