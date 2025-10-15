@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Play2048Wars: {
-      address: "0x196dbcbb54b8ec4958c959d8949ebfe87ac2aaaf",
+      address: "0x12975173b87f7595ee45dffb2ab812ece596bf84",
       abi: [
         {
           type: "constructor",
@@ -373,19 +373,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getTopTenWinners",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "address[]",
-              internalType: "address[]",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "isGameOver",
           inputs: [
             {
@@ -563,6 +550,16 @@ const deployedContracts = {
               internalType: "enum Lib2048WarsBoard.MoveDirection[]",
             },
             {
+              name: "newTilePositions",
+              type: "uint8[]",
+              internalType: "uint8[]",
+            },
+            {
+              name: "newTileValues",
+              type: "uint8[]",
+              internalType: "uint8[]",
+            },
+            {
               name: "expectedBoards",
               type: "uint256[]",
               internalType: "uint256[]",
@@ -662,6 +659,16 @@ const deployedContracts = {
               internalType: "enum Lib2048WarsBoard.MoveDirection[]",
             },
             {
+              name: "newTilePositions",
+              type: "uint8[]",
+              internalType: "uint8[]",
+            },
+            {
+              name: "newTileValues",
+              type: "uint8[]",
+              internalType: "uint8[]",
+            },
+            {
               name: "expectedBoards",
               type: "uint256[]",
               internalType: "uint256[]",
@@ -694,6 +701,16 @@ const deployedContracts = {
               name: "direction",
               type: "uint8",
               internalType: "enum Lib2048WarsBoard.MoveDirection",
+            },
+            {
+              name: "newTilePosition",
+              type: "uint8",
+              internalType: "uint8",
+            },
+            {
+              name: "newTileValue",
+              type: "uint8",
+              internalType: "uint8",
             },
             {
               name: "nextBoard",
@@ -977,7 +994,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 14,
+      deployedOnBlock: 19,
     },
   },
 } as const;
