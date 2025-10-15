@@ -27,4 +27,7 @@ Fun fact: the largest theoretically possible tile is 131,072.
 **Randomness:**
 To avoid determinism, the game picks offchain a random available cell, then adds a new tile either with value 2, with probability 0.9, or value 4, with probability 0.1.
 
+**Contract:**
+Base Sepolia: 84532
+
 ## How to play

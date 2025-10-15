@@ -52,19 +52,35 @@ contract VerifyAll is Script {
             abi.decode(vm.parseJson(content, searchStr(currTransactionIdx, "transaction.input")), (bytes));
         bytes memory compiledBytecode =
             abi.decode(vm.parseJson(_getCompiledBytecode(contractName), ".bytecode.object"), (bytes));
-        bytes memory constructorArgs =
-            BytesLib.slice(deployedBytecode, compiledBytecode.length, deployedBytecode.length - compiledBytecode.length);
+        bytes memory constructorArgs;
+        if (deployedBytecode.length > compiledBytecode.length) {
+            constructorArgs = BytesLib.slice(deployedBytecode, compiledBytecode.length, deployedBytecode.length - compiledBytecode.length);
+        } else {
+            constructorArgs = "";
+        }
 
-        string[] memory inputs = new string[](9);
-        inputs[0] = "forge";
-        inputs[1] = "verify-contract";
-        inputs[2] = vm.toString(contractAddr);
-        inputs[3] = contractName;
-        inputs[4] = "--chain";
-        inputs[5] = vm.toString(block.chainid);
-        inputs[6] = "--constructor-args";
-        inputs[7] = vm.toString(constructorArgs);
-        inputs[8] = "--watch";
+        string[] memory inputs;
+        if (constructorArgs.length > 0) {
+            inputs = new string[](9);
+            inputs[0] = "forge";
+            inputs[1] = "verify-contract";
+            inputs[2] = vm.toString(contractAddr);
+            inputs[3] = contractName;
+            inputs[4] = "--chain";
+            inputs[5] = vm.toString(block.chainid);
+            inputs[6] = "--constructor-args";
+            inputs[7] = vm.toString(constructorArgs);
+            inputs[8] = "--watch";
+        } else {
+            inputs = new string[](7);
+            inputs[0] = "forge";
+            inputs[1] = "verify-contract";
+            inputs[2] = vm.toString(contractAddr);
+            inputs[3] = contractName;
+            inputs[4] = "--chain";
+            inputs[5] = vm.toString(block.chainid);
+            inputs[6] = "--watch";
+        }
 
         FfiResult memory f = tempVm(address(vm)).tryFfi(inputs);
 
