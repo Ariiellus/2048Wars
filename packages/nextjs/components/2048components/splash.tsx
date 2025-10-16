@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { GameContext } from "~~/context/game-context";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
@@ -31,7 +31,7 @@ export default function GameWonButton({ heading = "You have reached 2048!", type
     [address, activeGameId],
   );
 
-  const handleGameWon = async () => {
+  const handleGameWon = useCallback(async () => {
     if (!canSubmit) return;
     try {
       setIsLoading(true);
@@ -43,9 +43,9 @@ export default function GameWonButton({ heading = "You have reached 2048!", type
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [canSubmit, writePlay2048WarsAsync, activeGameId, score, moves, address, startGame]);
 
-  const handleGameLost = async () => {
+  const handleGameLost = useCallback(async () => {
     if (!canSubmit) return;
     try {
       setIsLoading(true);
@@ -57,7 +57,7 @@ export default function GameWonButton({ heading = "You have reached 2048!", type
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [canSubmit, writePlay2048WarsAsync, activeGameId, startGame]);
 
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
 
@@ -71,7 +71,7 @@ export default function GameWonButton({ heading = "You have reached 2048!", type
         await handleGameLost();
       }
     })();
-  }, [type, canSubmit, isLoading, hasAutoSubmitted]);
+  }, [type, canSubmit, isLoading, hasAutoSubmitted, handleGameWon, handleGameLost]);
 
   const handlePrimary = type === "WON" ? handleGameWon : handleGameLost;
 
