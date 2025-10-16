@@ -55,12 +55,38 @@ contract Play2048Wars is Manager2048Wars {
   uint256 public nextGameId;                               // Next available game ID
   uint256 public totalGamesPlayed;                         // Total games played
 
+  // Final results mappings
+  mapping(address => uint256) public playerFinalScore;     // Final score for last completed game per player
+  mapping(address => uint256) public playerFinalMoves;     // Final moves played for last completed game per player
+
   // 
   // CONSTRUCTOR
   // 
   constructor(uint256 _entryFee, address _owner) Manager2048Wars(_entryFee, _owner) {
     nextGameId = 1;
     totalGamesPlayed = 0;
+  }
+  /**
+   * @notice Override enterGame to immediately create a game session and map gameId to player
+   */
+  function enterGame() public payable override {
+    super.enterGame();
+    // Reserve a unique gameId immediately on entry (starts at 1)
+    uint256 reservedId = nextGameId++;
+
+    GameSession memory placeholder = GameSession({
+      gameId: reservedId,
+      player: msg.sender,
+      initialBoard: 0,
+      currentBoard: 0,
+      score: 0,
+      isActive: false,
+      startTime: block.timestamp,
+      movesPlayed: 0
+    });
+
+    // Only set the per-player mapping; the canonical session is created in startGame.
+    playerGames[msg.sender] = placeholder;
   }
 
   // 
@@ -81,7 +107,13 @@ contract Play2048Wars is Manager2048Wars {
       revert Play2048Wars__InvalidInitialBoard();
     }
 
-    gameId = nextGameId++;
+    // Reuse reserved id from enterGame if present, else allocate a new one
+    uint256 reservedId = playerGames[msg.sender].gameId;
+    if (reservedId != 0 && gameSessions[reservedId].player == address(0)) {
+      gameId = reservedId;
+    } else {
+      gameId = nextGameId++;
+    }
     
     // Create new game session
     GameSession memory newGame = GameSession({
@@ -158,6 +190,9 @@ contract Play2048Wars is Manager2048Wars {
     // Check if game is over
     if (Lib2048WarsBoard.isGameOver(finalState.board)) {
       game.isActive = false;
+      // Persist final results for the player
+      playerFinalScore[msg.sender] = game.score;
+      playerFinalMoves[msg.sender] = game.movesPlayed;
       emit GameOver(msg.sender, game.gameId);
       emit GameCompleted(msg.sender, game.gameId, game.score);
       
@@ -173,6 +208,63 @@ contract Play2048Wars is Manager2048Wars {
   }
   
   // VALIDATION FUNCTIONS 
+
+  function gameWon(uint256 gameId, uint256 score, uint256 movesPlayed, address /* player */) public {
+    // Accept either a canonical session or a placeholder created in enterGame
+    GameSession storage sessionById = gameSessions[gameId];
+
+    if (sessionById.player == address(0)) {
+      // Fallback: ensure the caller's placeholder/current session matches this gameId
+      require(playerGames[msg.sender].gameId == gameId, "Invalid game");
+    } else {
+      require(sessionById.player == msg.sender, "Not your game");
+    }
+
+    // Persist final results by caller (authoritative signer)
+    playerFinalMoves[msg.sender] = movesPlayed;
+    playerFinalScore[msg.sender] = score;
+
+    // Mark as over in both mappings when applicable
+    if (sessionById.player != address(0)) {
+      sessionById.isActive = false;
+    }
+    if (playerGames[msg.sender].gameId == gameId) {
+      playerGames[msg.sender].isActive = false;
+    }
+
+    emit GameCompleted(msg.sender, gameId, score);
+
+    // Assign winner only if reaching threshold
+    if (score >= 2048) {
+      assignWinner(msg.sender);
+    }
+
+    // Clear role for next round participation rules
+    isPlayer[msg.sender] = false;
+  }
+
+  function gameLost(uint256 gameId) public {
+    // Accept either a canonical session or a placeholder created in enterGame
+    GameSession storage sessionById = gameSessions[gameId];
+
+    if (sessionById.player == address(0)) {
+      // Fallback: ensure the caller's placeholder/current session matches this gameId
+      require(playerGames[msg.sender].gameId == gameId, "Invalid game");
+    } else {
+      require(sessionById.player == msg.sender, "Not your game");
+    }
+
+    // Mark as over in both mappings when applicable
+    if (sessionById.player != address(0)) {
+      sessionById.isActive = false;
+    }
+    if (playerGames[msg.sender].gameId == gameId) {
+      playerGames[msg.sender].isActive = false;
+    }
+
+    isPlayer[msg.sender] = false;
+    emit GameOver(msg.sender, gameId);
+  }
 
   /**
    * @notice Validate a single move without executing it
@@ -229,6 +321,11 @@ contract Play2048Wars is Manager2048Wars {
     return gameSessions[gameId];
   }
 
+  // Convenience getter for frontend to fetch the active gameId of a player
+  function getGameId(address player) public view returns (uint256) {
+    return playerGames[player].gameId;
+  }
+
   function getInitialHash(uint8[] memory positionTile1, uint8[] memory positionTile2) public pure returns (uint256 hash) {
     return Lib2048WarsBoard.getInitialHash(positionTile1, positionTile2);
   }
@@ -250,6 +347,9 @@ contract Play2048Wars is Manager2048Wars {
     require(game.isActive, "No active game");
     
     game.isActive = false;
+    // Persist final results for the player
+    playerFinalScore[msg.sender] = Lib2048WarsBoard.calculateScore(game.currentBoard);
+    playerFinalMoves[msg.sender] = game.movesPlayed;
     emit GameOver(msg.sender, game.gameId);
   }
 }

@@ -58,7 +58,7 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
   /**
    * @notice This function will be more expensive the first time it is called after a new round has started
    */
-  function enterGame() public payable {
+  function enterGame() public payable virtual {
     require(!isPlayer[msg.sender], "You already entered the game");
     require(!isWinner[msg.sender], "You already won, wait for next round");
 
@@ -84,6 +84,9 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
   }
 
   function assignWinner(address _winner) internal {
+    require(!isWinner[_winner], "Already a winner");
+    require(isPlayer[_winner], "Not a player");
+
     isWinner[_winner] = true;
     winnersList.push(_winner);
     emit WinnerAssigned(_winner);

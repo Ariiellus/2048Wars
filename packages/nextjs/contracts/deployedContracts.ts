@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Play2048Wars: {
-      address: "0x12975173b87f7595ee45dffb2ab812ece596bf84",
+      address: "0x82dc47734901ee7d4f4232f398752cb9dd5daccc",
       abi: [
         {
           type: "constructor",
@@ -90,6 +90,19 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "gameLost",
+          inputs: [
+            {
+              name: "gameId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "gameSessions",
           inputs: [
             {
@@ -144,6 +157,34 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "gameWon",
+          inputs: [
+            {
+              name: "gameId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "score",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "movesPlayed",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "getAllWinners",
           inputs: [],
           outputs: [
@@ -172,6 +213,25 @@ const deployedContracts = {
           type: "function",
           name: "getEntryFee",
           inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getGameId",
+          inputs: [
+            {
+              name: "player",
+              type: "address",
+              internalType: "address",
+            },
+          ],
           outputs: [
             {
               name: "",
@@ -463,6 +523,44 @@ const deployedContracts = {
               name: "",
               type: "address",
               internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerFinalMoves",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerFinalScore",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -994,12 +1092,12 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 19,
+      deployedOnBlock: 30,
     },
   },
   84532: {
     Play2048Wars: {
-      address: "0xbc9ebab17fddc247a74c1256551af74a1137a7b4",
+      address: "0x657295981f2bac074d1144251b41276018292655",
       abi: [
         {
           type: "constructor",
@@ -1082,6 +1180,19 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "gameLost",
+          inputs: [
+            {
+              name: "gameId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "gameSessions",
           inputs: [
             {
@@ -1136,6 +1247,34 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "gameWon",
+          inputs: [
+            {
+              name: "gameId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "score",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "movesPlayed",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "getAllWinners",
           inputs: [],
           outputs: [
@@ -1164,6 +1303,25 @@ const deployedContracts = {
           type: "function",
           name: "getEntryFee",
           inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getGameId",
+          inputs: [
+            {
+              name: "player",
+              type: "address",
+              internalType: "address",
+            },
+          ],
           outputs: [
             {
               name: "",
@@ -1455,6 +1613,44 @@ const deployedContracts = {
               name: "",
               type: "address",
               internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerFinalMoves",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerFinalScore",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -1986,7 +2182,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 32383143,
+      deployedOnBlock: 32420148,
     },
   },
 } as const;
