@@ -20,7 +20,8 @@ const Home: NextPage = () => {
   const { data: isPlayer, refetch: refetchIsPlayer } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "isPlayer",
-    args: connectedAddress ? [connectedAddress] : [undefined],
+    args: [connectedAddress ?? undefined] as const,
+    watch: true,
   });
 
   const handleGameEntered = async () => {

@@ -1,6 +1,6 @@
 function withValidProperties(properties: Record<string, undefined | string | string[]>) {
   return Object.fromEntries(
-    Object.entries(properties).filter(([key, value]) => {
+    Object.entries(properties).filter(([value]) => {
       if (Array.isArray(value)) {
         return value.length > 0;
       }
@@ -24,9 +24,9 @@ export async function GET() {
       version: "1",
       name: "2048Wars!",
       subtitle: "2048wars",
-      description: "Battle friends in the ultimate 2048 game. Reach 2048 and compete on the leaderboard to win rewards",
+      description: "Reach 2048 and compete on the leaderboard to win rewards",
       screenshotUrls: [],
-      iconUrl: `${URL}/public/ 2048Wars-Logo.png`,
+      iconUrl: `${URL}/public/2048Wars-Logo.png`,
       splashImageUrl: `${URL}/2048Wars-Logo.png`,
       splashBackgroundColor: "#6200ea",
       homeUrl: URL,
