@@ -26,7 +26,7 @@ export async function GET() {
       subtitle: "2048wars",
       description: "Reach 2048 and compete on the leaderboard to win rewards",
       screenshotUrls: [],
-      iconUrl: `${URL}/public/2048Wars-Logo.png`,
+      iconUrl: `${URL}/2048Wars-Logo.png`,
       splashImageUrl: `${URL}/2048Wars-Logo.png`,
       splashBackgroundColor: "#6200ea",
       homeUrl: URL,
