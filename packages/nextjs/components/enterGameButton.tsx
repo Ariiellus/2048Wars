@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import CurrentPool from "./2048components/currentPool";
 import NextPool from "./2048components/nextPool";
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { useAccount, useBalance } from "wagmi";
 import { GameContext } from "~~/context/game-context";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
@@ -31,7 +31,9 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
     contractName: "Play2048Wars",
   });
 
-  const hasInsufficientFunds = balance && entryFee && BigInt(balance.value) < BigInt(entryFee);
+  // Check if user has enough ETH for entry fee + gas (0.0015 ETH total)
+  const requiredAmount = parseEther("0.0015");
+  const hasInsufficientFunds = balance && BigInt(balance.value) < requiredAmount;
 
   const handleEnterGame = async () => {
     if (!entryFee) return;
@@ -71,7 +73,10 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
           <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">
             <p className="font-bold text-sm text-red-800 mb-1">Insufficient funds!</p>
             <p className="text-sm text-red-700">
-              You need {formatEther(BigInt(entryFee || "0"))} ETH to enter the game.
+              You need at least 0.0015 ETH to enter the game (0.001 ETH entry fee + 0.0005 ETH gas).
+            </p>
+            <p className="text-xs text-red-600 mt-1">
+              Current balance: {balance ? formatEther(BigInt(balance.value)) : "0"} ETH
             </p>
           </div>
         )}
@@ -86,7 +91,7 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
                   : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             }`}
             onClick={handleEnterGame}
-            disabled={isLoading || hasInsufficientFunds || !entryFee}
+            disabled={isLoading || hasInsufficientFunds || !entryFee || !balance}
           >
             {isLoading ? "Processing..." : hasInsufficientFunds ? "Insufficient Funds" : "Enter Game"}
           </button>

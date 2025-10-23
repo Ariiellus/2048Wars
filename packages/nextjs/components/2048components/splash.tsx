@@ -2,17 +2,19 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { GameContext } from "~~/context/game-context";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
+import { useSeamlessTransactions } from "~~/hooks/useSeamlessTransactions";
 import styles from "~~/styles/2048styles/splash.module.css";
 
 export default function GameWonButton({ heading = "You have reached 2048!", type = "WON" }) {
   const { startGame, score, moves } = useContext(GameContext);
   const [isLoading, setIsLoading] = useState(false);
   const { address } = useAccount();
-
-  const { writeContractAsync: writePlay2048WarsAsync } = useScaffoldWriteContract({
-    contractName: "Play2048Wars",
-  });
+  const {
+    submitGameWin,
+    submitGameLoss,
+    isLoading: isTransactionLoading,
+    hasEmbeddedWallet,
+  } = useSeamlessTransactions();
 
   const { data: playerGame } = useScaffoldReadContract({
     contractName: "Play2048Wars",
@@ -27,51 +29,56 @@ export default function GameWonButton({ heading = "You have reached 2048!", type
   }, [playerGame]);
 
   const canSubmit = useMemo(
-    () => !!address && typeof activeGameId === "bigint" && (activeGameId as bigint) > 0n,
-    [address, activeGameId],
+    () => !!address && typeof activeGameId === "bigint" && (activeGameId as bigint) > 0n && hasEmbeddedWallet,
+    [address, activeGameId, hasEmbeddedWallet],
   );
 
   const handleGameWon = useCallback(async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !activeGameId) return;
     try {
       setIsLoading(true);
-      await writePlay2048WarsAsync({
-        functionName: "gameWon",
-        args: [activeGameId as bigint, BigInt(score ?? 0), BigInt(moves ?? 0), address!],
-      });
+      await submitGameWin(activeGameId, BigInt(score ?? 0), BigInt(moves ?? 0));
       startGame();
+    } catch (error) {
+      console.error("Failed to submit win:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [canSubmit, writePlay2048WarsAsync, activeGameId, score, moves, address, startGame]);
+  }, [canSubmit, activeGameId, submitGameWin, score, moves, startGame]);
 
   const handleGameLost = useCallback(async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !activeGameId) return;
     try {
       setIsLoading(true);
-      await writePlay2048WarsAsync({
-        functionName: "gameLost",
-        args: [activeGameId as bigint],
-      });
+      await submitGameLoss(activeGameId);
       startGame();
+    } catch (error) {
+      console.error("Failed to submit loss:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [canSubmit, writePlay2048WarsAsync, activeGameId, startGame]);
+  }, [canSubmit, activeGameId, submitGameLoss, startGame]);
 
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const isProcessing = isLoading || isTransactionLoading;
 
   useEffect(() => {
-    if (!canSubmit || isLoading || hasAutoSubmitted) return;
+    if (!canSubmit || isProcessing || hasAutoSubmitted) return;
     (async () => {
       setHasAutoSubmitted(true);
       if (type === "WON") {
         await handleGameWon();
       } else {
+        // For losses, submit and redirect after 3 seconds
         await handleGameLost();
+        setIsRedirecting(true);
+        setTimeout(() => {
+          startGame(); // This will redirect to main page
+        }, 3000);
       }
     })();
-  }, [type, canSubmit, isLoading, hasAutoSubmitted, handleGameWon, handleGameLost]);
+  }, [type, canSubmit, isProcessing, hasAutoSubmitted, handleGameWon, handleGameLost, startGame]);
 
   const handlePrimary = type === "WON" ? handleGameWon : handleGameLost;
 
@@ -82,17 +89,20 @@ export default function GameWonButton({ heading = "You have reached 2048!", type
         {type === "WON" ? (
           hasAutoSubmitted ? (
             <button className={styles.button} disabled>
-              Submitting win...
+              {isProcessing ? "Submitting win..." : "Processing..."}
             </button>
           ) : (
-            <button className={styles.button} disabled={!canSubmit || isLoading} onClick={handlePrimary}>
-              Confirm Win
+            <button className={styles.button} disabled={!canSubmit || isProcessing} onClick={handlePrimary}>
+              {isProcessing ? "Processing..." : "Confirm Win"}
             </button>
           )
         ) : (
           <button className={styles.button} disabled>
-            Submitting loss...
+            {isProcessing ? "Submitting loss..." : isRedirecting ? "Redirecting in 3 seconds..." : "Processing..."}
           </button>
+        )}
+        {!hasEmbeddedWallet && (
+          <p className="text-sm text-yellow-600 mt-2">⚠️ Embedded wallet required for seamless transactions</p>
         )}
       </div>
     </div>

@@ -78,6 +78,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
           ethereum: {
             createOnLogin: "all-users",
           },
+          showWalletUIs: false,
         },
         walletConnectCloudProjectId: undefined,
         defaultChain: wagmiConfig.chains[0],
