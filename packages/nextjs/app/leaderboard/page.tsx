@@ -11,7 +11,6 @@ interface LeaderboardEntry {
   player: string;
   score: number;
   moves: number;
-  timestamp: number;
 }
 
 const Leaderboard: NextPage = () => {
@@ -54,7 +53,6 @@ const Leaderboard: NextPage = () => {
             player: winner,
             score: Number(score),
             moves: Number(moves),
-            timestamp: Date.now(),
           };
         } catch (error) {
           console.error(`Error fetching data for ${winner}:`, error);
@@ -63,7 +61,9 @@ const Leaderboard: NextPage = () => {
       });
 
       const results = await Promise.all(promises);
-      const validData = results.filter((entry: LeaderboardEntry | null): entry is LeaderboardEntry => entry !== null);
+      const validData = results.filter(
+        (entry: LeaderboardEntry | null): entry is LeaderboardEntry => entry !== null,
+      ) as LeaderboardEntry[];
 
       validData.sort((a, b) => b.score - a.score);
 
@@ -72,17 +72,6 @@ const Leaderboard: NextPage = () => {
 
     fetchWinnersData();
   }, [winnersList, publicClient, contractInfo]);
-
-  const formatTimeAgo = (timestamp: number) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    return "Just now";
-  };
 
   return (
     <div className="container mx-auto my-10 px-4">
@@ -106,7 +95,7 @@ const Leaderboard: NextPage = () => {
               </div>
             ) : (
               leaderboardData.map((entry, index) => (
-                <div key={`${entry.player}-${entry.timestamp}`} className="p-4 hover:bg-gray-50 transition-colors">
+                <div key={`${entry.player}-${index}`} className="p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-lg">
@@ -121,7 +110,6 @@ const Leaderboard: NextPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500">{formatTimeAgo(entry.timestamp)}</p>
                       </div>
                     </div>
                     <div className="text-right space-y-1">
