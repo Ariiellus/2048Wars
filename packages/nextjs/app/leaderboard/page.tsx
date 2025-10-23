@@ -2,53 +2,76 @@
 
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 interface LeaderboardEntry {
   player: string;
   score: number;
+  moves: number;
   timestamp: number;
 }
 
 const Leaderboard: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const publicClient = usePublicClient();
+
+  const { data: contractInfo } = useDeployedContractInfo("Play2048Wars");
 
   const { data: winnersList } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getAllWinners",
   });
 
-  // Get player stats if connected
-  const { data: playerGame } = useScaffoldReadContract({
-    contractName: "Play2048Wars",
-    functionName: "getPlayerGame",
-    args: connectedAddress ? [connectedAddress] : [""],
-  });
-
   useEffect(() => {
-    if (winnersList && winnersList.length > 0) {
-      // Convert winners list to leaderboard format
-      const formattedData: LeaderboardEntry[] = winnersList.map((winner: string, index: number) => ({
-        player: winner,
-        score: 2048, // Winners have achieved 2048
-        timestamp: Date.now() - index * 3600000, // Mock timestamp
-      }));
-      setLeaderboardData(formattedData);
-    } else {
-      // Use mock data when no real data is available
-      const mockData: LeaderboardEntry[] = [
-        { player: "0x1234567890123456789012345678901234567890", score: 15420, timestamp: Date.now() - 3600000 },
-        { player: "0x2345678901234567890123456789012345678901", score: 12340, timestamp: Date.now() - 7200000 },
-        { player: "0x3456789012345678901234567890123456789012", score: 9876, timestamp: Date.now() - 10800000 },
-        { player: "0x4567890123456789012345678901234567890123", score: 7654, timestamp: Date.now() - 14400000 },
-        { player: "0x5678901234567890123456789012345678901234", score: 5432, timestamp: Date.now() - 18000000 },
-      ];
-      setLeaderboardData(mockData);
+    async function fetchWinnersData() {
+      if (!winnersList || winnersList.length === 0 || !publicClient || !contractInfo) {
+        setLeaderboardData([]);
+        return;
+      }
+
+      const promises = winnersList.map(async (winner: string) => {
+        try {
+          const [score, moves] = await Promise.all([
+            publicClient.readContract({
+              address: contractInfo.address,
+              abi: contractInfo.abi,
+              functionName: "playerFinalScore",
+              args: [winner],
+            }),
+            publicClient.readContract({
+              address: contractInfo.address,
+              abi: contractInfo.abi,
+              functionName: "playerFinalMoves",
+              args: [winner],
+            }),
+          ]);
+
+          return {
+            player: winner,
+            score: Number(score),
+            moves: Number(moves),
+            timestamp: Date.now(),
+          };
+        } catch (error) {
+          console.error(`Error fetching data for ${winner}:`, error);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(promises);
+      const validData = results.filter((entry: LeaderboardEntry | null): entry is LeaderboardEntry => entry !== null);
+
+      validData.sort((a, b) => b.score - a.score);
+
+      setLeaderboardData(validData);
     }
-  }, [winnersList]);
+
+    fetchWinnersData();
+  }, [winnersList, publicClient, contractInfo]);
 
   const formatTimeAgo = (timestamp: number) => {
     const now = Date.now();
@@ -101,9 +124,14 @@ const Leaderboard: NextPage = () => {
                         <p className="text-sm text-gray-500">{formatTimeAgo(entry.timestamp)}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-gray-900">{entry.score.toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">points</div>
+                    <div className="text-right space-y-1">
+                      <div>
+                        <div className="text-2xl font-bold text-gray-900">{entry.score.toLocaleString()}</div>
+                        <div className="text-sm text-gray-500">points</div>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {entry.moves > 0 ? `${entry.moves} moves` : "No data"}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -112,17 +140,25 @@ const Leaderboard: NextPage = () => {
           </div>
         </div>
 
-        {connectedAddress && playerGame && (
+        {connectedAddress && leaderboardData.find(e => e.player.toLowerCase() === connectedAddress.toLowerCase()) && (
           <div className="mt-8">
             <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Stats</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{Number(playerGame.score).toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {Number(
+                      leaderboardData.find(e => e.player.toLowerCase() === connectedAddress.toLowerCase())?.score || 0,
+                    ).toLocaleString()}
+                  </div>
                   <div className="text-sm text-gray-600">Current Score</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{Number(playerGame.movesPlayed)}</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {Number(
+                      leaderboardData.find(e => e.player.toLowerCase() === connectedAddress.toLowerCase())?.moves || 0,
+                    )}
+                  </div>
                   <div className="text-sm text-gray-600">Moves Played</div>
                 </div>
               </div>
