@@ -2,8 +2,9 @@ import { useContext, useState } from "react";
 import CurrentPool from "./2048components/currentPool";
 import NextPool from "./2048components/nextPool";
 import { formatEther, parseEther } from "viem";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, usePublicClient } from "wagmi";
 import { GameContext } from "~~/context/game-context";
+import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 
@@ -17,6 +18,7 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
   const { startGame } = useContext(GameContext);
   const [isLoading, setIsLoading] = useState(false);
   const { address } = useAccount();
+  const publicClient = usePublicClient();
 
   const { data: balance } = useBalance({
     address: address,
@@ -45,12 +47,60 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
         value: BigInt(entryFee),
       });
 
-      startGame();
+      // Wait a moment for the transaction to be processed
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Get the gameId from the contract after entering the game
+      let gameId: bigint | undefined;
+      if (publicClient && address) {
+        // Try to get gameId with retries
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const contract = deployedContracts[84532].Play2048Wars;
+            console.log(`Attempt ${attempt + 1}: Getting gameId from contract for address:`, address);
+            const result = await publicClient.readContract({
+              address: contract.address as `0x${string}`,
+              abi: contract.abi,
+              functionName: "getPlayerGameId",
+              args: [address],
+            });
+            gameId = result as bigint;
+            console.log("Retrieved gameId:", gameId);
+
+            // Check if gameId is valid (not 0)
+            if (gameId === 0n) {
+              console.warn(`Attempt ${attempt + 1}: GameId is 0, player may not be properly registered`);
+              if (attempt < 2) {
+                console.log("Retrying in 1 second...");
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                continue;
+              }
+              gameId = undefined;
+            } else {
+              console.log(`Successfully got gameId: ${gameId} on attempt ${attempt + 1}`);
+              break;
+            }
+          } catch (error) {
+            console.warn(`Attempt ${attempt + 1}: Failed to get gameId from contract:`, error);
+            if (attempt < 2) {
+              console.log("Retrying in 1 second...");
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+          }
+        }
+      } else {
+        console.warn("Cannot get gameId - missing publicClient or address:", { publicClient: !!publicClient, address });
+      }
+
+      // Start the game with the retrieved gameId
+      startGame(gameId);
+
       if (onGameEntered) {
         onGameEntered();
       }
     } catch (error) {
       console.error("Failed to enter game:", error);
+    } finally {
       setIsLoading(false);
     }
   };

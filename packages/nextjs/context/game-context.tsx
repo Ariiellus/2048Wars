@@ -1,9 +1,11 @@
 import { PropsWithChildren, createContext, useCallback, useEffect, useReducer, useRef } from "react";
 import { gameWinTileValue, mergeAnimationDuration, tileCountPerDimension } from "../constants";
+import deployedContracts from "../contracts/deployedContracts";
 import { useSeamlessTransactions } from "../hooks/useSeamlessTransactions";
 import { Tile } from "../models/tile";
 import gameReducer, { initialState } from "../reducers/game-reducer";
 import { isNil } from "lodash";
+import { useAccount, usePublicClient } from "wagmi";
 
 type MoveDirection = "MOVE_UP" | "MOVE_DOWN" | "MOVE_LEFT" | "MOVE_RIGHT";
 
@@ -24,6 +26,8 @@ export default function GameProvider({ children }: PropsWithChildren) {
   const gameStateRef = useRef(gameState);
   const { checkpoint, hasEmbeddedWallet } = useSeamlessTransactions();
   const gameIdRef = useRef<bigint | null>(null);
+  const { address } = useAccount();
+  const publicClient = usePublicClient();
 
   const getEmptyCells = useCallback(() => {
     const results: [number, number][] = [];
@@ -70,16 +74,53 @@ export default function GameProvider({ children }: PropsWithChildren) {
 
   // Auto-checkpoint every 10 moves
   const autoCheckpoint = useCallback(async () => {
-    if (!hasEmbeddedWallet || !gameIdRef.current) return;
+    if (!hasEmbeddedWallet || !gameIdRef.current) {
+      console.log("Skipping checkpoint - no embedded wallet or gameId:", {
+        hasEmbeddedWallet,
+        gameId: gameIdRef.current,
+      });
+      return;
+    }
 
     try {
       const boardArray = boardToArray();
-      await checkpoint(gameIdRef.current, boardArray, gameState.moves, gameState.score);
+
+      // Get the current gameId from contract right before checkpointing
+      let currentGameId = gameIdRef.current;
+      if (publicClient && address) {
+        try {
+          const contract = deployedContracts[84532].Play2048Wars;
+          const result = await publicClient.readContract({
+            address: contract.address as `0x${string}`,
+            abi: contract.abi,
+            functionName: "getPlayerGameId",
+            args: [address],
+          });
+          currentGameId = result as bigint;
+          console.log("Current gameId from contract:", currentGameId);
+        } catch (error) {
+          console.warn("Failed to get current gameId from contract:", error);
+        }
+      }
+
+      console.log("Attempting checkpoint with:", {
+        gameId: currentGameId,
+        moves: gameState.moves,
+        score: gameState.score,
+        boardArray: boardArray.slice(0, 4), // Log first 4 elements for debugging
+      });
+
+      await checkpoint(currentGameId, boardArray, gameState.moves, gameState.score);
       console.log(`Checkpoint saved at move ${gameState.moves}`);
     } catch (error) {
       console.error("Failed to save checkpoint:", error);
+      console.error("Checkpoint details:", {
+        gameId: gameIdRef.current,
+        moves: gameState.moves,
+        score: gameState.score,
+      });
     }
-  }, [hasEmbeddedWallet, boardToArray, checkpoint, gameState.moves, gameState.score]);
+  }, [hasEmbeddedWallet, boardToArray, checkpoint, gameState.moves, gameState.score, address, publicClient]);
 
   // Manual checkpoint function
   const manualCheckpoint = useCallback(async () => {
@@ -114,6 +155,9 @@ export default function GameProvider({ children }: PropsWithChildren) {
     // Set game ID for checkpoint functionality
     if (gameId) {
       gameIdRef.current = gameId;
+      console.log("Game started with gameId:", gameId);
+    } else {
+      console.warn("Game started without gameId");
     }
 
     // Generate all possible positions on the board

@@ -11,6 +11,7 @@ import {Manager2048Wars} from "./Manager2048Wars.sol";
  */
 contract Play2048Wars is Manager2048Wars {
 
+  event GameStarted(address indexed player, uint256 gameId);
   event GameCompleted(address indexed player, uint256 gameId, uint256 finalScore);
   event GameOver(address indexed player, uint256 gameId);
   event CheckpointSaved(address indexed player, uint256 gameId, uint256 board, uint8 moves, uint256 score);
@@ -37,10 +38,17 @@ contract Play2048Wars is Manager2048Wars {
   }
 
   function enterGame() public payable override {
+    // Check if player already has an active game
+    require(playerGameId[msg.sender] == 0, "You already have an active game");
+    
+    // Call parent enterGame to handle round management and player registration
     super.enterGame();
+    
     // Assign a unique gameId to the player
     playerGameId[msg.sender] = nextGameId++;
     totalGamesPlayed++;
+    
+    emit GameStarted(msg.sender, playerGameId[msg.sender]);
   }
 
   function gameWon(uint256 gameId, uint256 score, uint256 movesPlayed, address /* player */) public {
@@ -53,6 +61,9 @@ contract Play2048Wars is Manager2048Wars {
 
     assignWinner(msg.sender);
     isPlayer[msg.sender] = false;
+    
+    // Reset gameId so player can start a new game
+    playerGameId[msg.sender] = 0;
   }
 
   function gameLost(uint256 gameId) public {
@@ -60,6 +71,9 @@ contract Play2048Wars is Manager2048Wars {
 
     isPlayer[msg.sender] = false;
     emit GameOver(msg.sender, gameId);
+    
+    // Reset gameId so player can start a new game
+    playerGameId[msg.sender] = 0;
   }
 
   /**

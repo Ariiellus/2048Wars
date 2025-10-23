@@ -724,6 +724,25 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "GameStarted",
+          inputs: [
+            {
+              name: "player",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "gameId",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "NewRoundStarted",
           inputs: [],
           anonymous: false,
@@ -826,7 +845,7 @@ const deployedContracts = {
   },
   84532: {
     Play2048Wars: {
-      address: "0xde242eba7d899643491c46c397c7ccb22cc7b573",
+      address: "0xa65937a3e7fcda3d7d1debc2ffa9d1bba9fd9ab0",
       abi: [
         {
           type: "constructor",
@@ -1543,6 +1562,25 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "GameStarted",
+          inputs: [
+            {
+              name: "player",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "gameId",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "NewRoundStarted",
           inputs: [],
           anonymous: false,
@@ -1640,7 +1678,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 32744282,
+      deployedOnBlock: 32746904,
     },
   },
 } as const;
