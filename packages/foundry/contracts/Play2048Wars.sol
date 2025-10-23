@@ -2,56 +2,21 @@
 pragma solidity ^0.8.30;
 
 import {Manager2048Wars} from "./Manager2048Wars.sol";
-import {Lib2048WarsBoard} from "./Lib2048WarsBoard.sol";
 
 /**
  * @title Play2048Wars
- * @notice Main contract for playing 2048 Wars with batched move system
+ * @notice Main contract for playing 2048 Wars with checkpoint system
  * @dev Inherits from Manager2048Wars for tournament functionality
- * @dev Implements batched move processing for gas efficiency
+ * @dev Implements checkpoint system for game recovery
  */
 contract Play2048Wars is Manager2048Wars {
-  using Lib2048WarsBoard for *;
 
-  // 
-  // ERRORS
-  // 
-  error Play2048Wars__InvalidInitialBoard();
-  error Play2048Wars__GameNotStarted();
-  error Play2048Wars__InvalidBatchSize();
-  error Play2048Wars__BatchValidationFailed(string reason);
-  error Play2048Wars__GameAlreadyStarted();
-  error Play2048Wars__NotPlayer();
-
-  // 
-  // EVENTS
-  // 
-  event GameStarted(address indexed player, uint256 gameId, uint256 initialBoard);
-  event BatchMovesProcessed(address indexed player, uint256 gameId, uint8 moveCount, uint256 finalBoard);
   event GameCompleted(address indexed player, uint256 gameId, uint256 finalScore);
   event GameOver(address indexed player, uint256 gameId);
-
-  // 
-  // STATE VARIABLES
-  // 
+  event CheckpointSaved(address indexed player, uint256 gameId, uint256 board, uint8 moves, uint256 score);
   
-  /**
-   * @notice Game session structure
-   */
-  struct GameSession {
-    uint256 gameId;           // Unique game identifier
-    address player;           // Player address
-    uint256 initialBoard;     // Starting board state
-    uint256 currentBoard;     // Current board state
-    uint256 score;            // Current score
-    bool isActive;            // Whether game is still active
-    uint256 startTime;        // Game start timestamp
-    uint8 movesPlayed;        // Total moves played in this game
-  }
-
   // Game state mappings
-  mapping(address => GameSession) public playerGames;      // Active game per player
-  mapping(uint256 => GameSession) public gameSessions;     // Game sessions by ID
+  mapping(address => uint256) public playerGameId;         // Active game ID per player
   uint256 public nextGameId;                               // Next available game ID
   uint256 public totalGamesPlayed;                         // Total games played
 
@@ -59,297 +24,118 @@ contract Play2048Wars is Manager2048Wars {
   mapping(address => uint256) public playerFinalScore;     // Final score for last completed game per player
   mapping(address => uint256) public playerFinalMoves;     // Final moves played for last completed game per player
 
-  // 
-  // CONSTRUCTOR
-  // 
+  // Checkpoint mappings for game recovery
+  mapping(address => uint256) public playerCheckpointGameId;    // Game ID of last checkpoint
+  mapping(address => bytes32) public playerCheckpointBoardHash; // Board state hash at last checkpoint
+  mapping(address => uint256) public playerCheckpointScore;    // Score at last checkpoint
+  mapping(address => uint8) public playerCheckpointMoves;       // Moves played at last checkpoint
+  mapping(address => uint256) public playerCheckpointTime;     // Timestamp of last checkpoint
+
   constructor(uint256 _entryFee, address _owner) Manager2048Wars(_entryFee, _owner) {
     nextGameId = 1;
     totalGamesPlayed = 0;
   }
-  /**
-   * @notice Override enterGame to immediately create a game session and map gameId to player
-   */
+
   function enterGame() public payable override {
     super.enterGame();
-    // Reserve a unique gameId immediately on entry (starts at 1)
-    uint256 reservedId = nextGameId++;
-
-    GameSession memory placeholder = GameSession({
-      gameId: reservedId,
-      player: msg.sender,
-      initialBoard: 0,
-      currentBoard: 0,
-      score: 0,
-      isActive: false,
-      startTime: block.timestamp,
-      movesPlayed: 0
-    });
-
-    // Only set the per-player mapping; the canonical session is created in startGame.
-    playerGames[msg.sender] = placeholder;
-  }
-
-  // 
-  // GAME MANAGEMENT FUNCTIONS
-  // 
-
-  /**
-   * @notice Start a new game session for the calling player
-   * @param initialBoard Valid initial board state (must have exactly 2 tiles with value 2)
-   * @return gameId The ID of the newly created game
-   */
-  function startGame(uint256 initialBoard) public returns (uint256 gameId) {
-    require(isPlayer[msg.sender], "Must be a registered player");
-    require(playerGames[msg.sender].isActive == false, "Game already active");
-
-    // Validate initial board
-    if (!Lib2048WarsBoard.validateInitialPosition(initialBoard)) {
-      revert Play2048Wars__InvalidInitialBoard();
-    }
-
-    // Reuse reserved id from enterGame if present, else allocate a new one
-    uint256 reservedId = playerGames[msg.sender].gameId;
-    if (reservedId != 0 && gameSessions[reservedId].player == address(0)) {
-      gameId = reservedId;
-    } else {
-      gameId = nextGameId++;
-    }
-    
-    // Create new game session
-    GameSession memory newGame = GameSession({
-      gameId: gameId,
-      player: msg.sender,
-      initialBoard: initialBoard,
-      currentBoard: initialBoard,
-      score: 0,
-      isActive: true,
-      startTime: block.timestamp,
-      movesPlayed: 0
-    });
-
-    // Store game session
-    playerGames[msg.sender] = newGame;
-    gameSessions[gameId] = newGame;
+    // Assign a unique gameId to the player
+    playerGameId[msg.sender] = nextGameId++;
     totalGamesPlayed++;
-
-    emit GameStarted(msg.sender, gameId, initialBoard);
-    return gameId;
   }
-
-  /**
-   * @notice Process a batch of up to 10 moves for the calling player's active game
-   * @param directions Array of move directions (UP=0, DOWN=1, LEFT=2, RIGHT=3)
-   * @param newTilePositions Array of new tile positions for each move
-   * @param newTileValues Array of new tile values for each move
-   * @param expectedBoards Array of expected board states after each move (for validation)
-   * @return success Whether the batch was processed successfully
-   * @return finalBoard The final board state after processing all moves
-   */
-  function processBatchMoves(
-    Lib2048WarsBoard.MoveDirection[] memory directions,
-    uint8[] memory newTilePositions,
-    uint8[] memory newTileValues,
-    uint256[] memory expectedBoards
-  ) public returns (bool success, uint256 finalBoard) {
-    GameSession storage game = playerGames[msg.sender];
-    
-    // Validation checks
-    if (!game.isActive) {
-      revert Play2048Wars__GameNotStarted();
-    }
-    if (directions.length == 0 || directions.length > 10) {
-      revert Play2048Wars__InvalidBatchSize();
-    }
-    if (directions.length != expectedBoards.length) {
-      revert Play2048Wars__BatchValidationFailed("Directions and expected boards length mismatch");
-    }
-    if (directions.length != newTilePositions.length || directions.length != newTileValues.length) {
-      revert Play2048Wars__BatchValidationFailed("Array length mismatch");
-    }
-
-    // Create board state from current game state
-    Lib2048WarsBoard.BoardState memory currentState;
-    currentState.board = game.currentBoard;
-    currentState.score = game.score;
-    currentState.hasChanged = false;
-
-    // Process the batch using library function
-    (Lib2048WarsBoard.MoveBatch memory batchResult, Lib2048WarsBoard.BoardState memory finalState) = 
-      Lib2048WarsBoard.processMoveBatch(currentState, directions, newTilePositions, newTileValues, expectedBoards);
-
-    // Check if batch validation passed
-    if (!batchResult.isValid) {
-      revert Play2048Wars__BatchValidationFailed(batchResult.validationError);
-    }
-
-    // Update game state
-    game.currentBoard = finalState.board;
-    game.score = Lib2048WarsBoard.calculateScore(finalState.board);
-    game.movesPlayed += uint8(directions.length);
-
-    // Check if game is over
-    if (Lib2048WarsBoard.isGameOver(finalState.board)) {
-      game.isActive = false;
-      // Persist final results for the player
-      playerFinalScore[msg.sender] = game.score;
-      playerFinalMoves[msg.sender] = game.movesPlayed;
-      emit GameOver(msg.sender, game.gameId);
-      emit GameCompleted(msg.sender, game.gameId, game.score);
-      
-      // Check if player won (reached 2048 tile)
-      if (game.score >= 2048) {
-        assignWinner(msg.sender);
-      }
-    }
-
-    emit BatchMovesProcessed(msg.sender, game.gameId, uint8(directions.length), finalState.board);
-    
-    return (true, finalState.board);
-  }
-  
-  // VALIDATION FUNCTIONS 
 
   function gameWon(uint256 gameId, uint256 score, uint256 movesPlayed, address /* player */) public {
-    // Accept either a canonical session or a placeholder created in enterGame
-    GameSession storage sessionById = gameSessions[gameId];
+    require(playerGameId[msg.sender] == gameId, "Invalid game");
 
-    if (sessionById.player == address(0)) {
-      // Fallback: ensure the caller's placeholder/current session matches this gameId
-      require(playerGames[msg.sender].gameId == gameId, "Invalid game");
-    } else {
-      require(sessionById.player == msg.sender, "Not your game");
-    }
-
-    // Persist final results by caller (authoritative signer)
     playerFinalMoves[msg.sender] = movesPlayed;
     playerFinalScore[msg.sender] = score;
 
-    // Mark as over in both mappings when applicable
-    if (sessionById.player != address(0)) {
-      sessionById.isActive = false;
-    }
-    if (playerGames[msg.sender].gameId == gameId) {
-      playerGames[msg.sender].isActive = false;
-    }
-
     emit GameCompleted(msg.sender, gameId, score);
 
-    // Assign winner only if reaching threshold
-    if (score >= 2048) {
-      assignWinner(msg.sender);
-    }
-
-    // Clear role for next round participation rules
+    assignWinner(msg.sender);
     isPlayer[msg.sender] = false;
   }
 
   function gameLost(uint256 gameId) public {
-    // Accept either a canonical session or a placeholder created in enterGame
-    GameSession storage sessionById = gameSessions[gameId];
-
-    if (sessionById.player == address(0)) {
-      // Fallback: ensure the caller's placeholder/current session matches this gameId
-      require(playerGames[msg.sender].gameId == gameId, "Invalid game");
-    } else {
-      require(sessionById.player == msg.sender, "Not your game");
-    }
-
-    // Mark as over in both mappings when applicable
-    if (sessionById.player != address(0)) {
-      sessionById.isActive = false;
-    }
-    if (playerGames[msg.sender].gameId == gameId) {
-      playerGames[msg.sender].isActive = false;
-    }
+    require(playerGameId[msg.sender] == gameId, "Invalid game");
 
     isPlayer[msg.sender] = false;
     emit GameOver(msg.sender, gameId);
   }
 
   /**
-   * @notice Validate a single move without executing it
-   * @param previousBoard Board state before the move
-   * @param direction Direction of the move
-   * @param newTilePosition Position for the new tile
-   * @param newTileValue Value for the new tile
-   * @param nextBoard Expected board state after the move
-   * @return isValid Whether the move is valid
+   * @notice Save a checkpoint of the current game state for recovery
+   * @param gameId The game ID to checkpoint
+   * @param boardArray Current board state as array (16 tiles)
+   * @param moves Number of moves played so far
+   * @param score Current score
    */
-  function validateMove(
-    uint256 previousBoard, 
-    Lib2048WarsBoard.MoveDirection direction,
-    uint8 newTilePosition,
-    uint8 newTileValue,
-    uint256 nextBoard
-  ) public pure returns (bool isValid) {
-    (isValid,) = Lib2048WarsBoard.validateMove(previousBoard, direction, newTilePosition, newTileValue, nextBoard);
-    return isValid;
+  function checkpoint(uint256 gameId, uint8[16] calldata boardArray, uint8 moves, uint256 score) public {
+    require(isPlayer[msg.sender], "Must be a registered player");
+    require(playerGameId[msg.sender] == gameId, "Invalid game");
+
+    // Create hash of the board array using ABI encoding
+    bytes32 boardHash = keccak256(abi.encode(boardArray));
+
+    playerCheckpointGameId[msg.sender] = gameId;
+    playerCheckpointBoardHash[msg.sender] = boardHash;
+    playerCheckpointScore[msg.sender] = score;
+    playerCheckpointMoves[msg.sender] = moves;
+    playerCheckpointTime[msg.sender] = block.timestamp;
+
+    emit CheckpointSaved(msg.sender, gameId, uint256(boardHash), moves, score);
   }
 
-  /**
-   * @notice Validate a batch of moves without executing them
-   * @param startBoard Starting board state
-   * @param directions Array of move directions
-   * @param newTilePositions Array of new tile positions for each move
-   * @param newTileValues Array of new tile values for each move
-   * @param expectedBoards Array of expected board states
-   * @return isValid Whether all moves are valid
-   * @return errorIndex Index of first invalid move (if any)
-   */
-  function validateBatchMoves(
-    uint256 startBoard,
-    Lib2048WarsBoard.MoveDirection[] memory directions,
-    uint8[] memory newTilePositions,
-    uint8[] memory newTileValues,
-    uint256[] memory expectedBoards
-  ) public pure returns (bool isValid, uint8 errorIndex) {
-    (isValid, errorIndex,) = Lib2048WarsBoard.validateMoveBatch(startBoard, directions, newTilePositions, newTileValues, expectedBoards);
-    return (isValid, errorIndex);
-  }
-
-  function verifyInitialBoard(uint256 initialBoard) public pure returns (bool isValid) {
-    return Lib2048WarsBoard.validateInitialPosition(initialBoard);
-  }
-
-  // GETTER FUNCTIONS
-
-  function getPlayerGame(address player) public view returns (GameSession memory game) {
-    return playerGames[player];
-  }
-
-  function getGameSession(uint256 gameId) public view returns (GameSession memory game) {
-    return gameSessions[gameId];
-  }
-
-  // Convenience getter for frontend to fetch the active gameId of a player
-  function getGameId(address player) public view returns (uint256) {
-    return playerGames[player].gameId;
-  }
-
-  function getInitialHash(uint8[] memory positionTile1, uint8[] memory positionTile2) public pure returns (uint256 hash) {
-    return Lib2048WarsBoard.getInitialHash(positionTile1, positionTile2);
-  }
-
-  function calculateScore(uint256 board) public pure returns (uint256 score) {
-    return Lib2048WarsBoard.calculateScore(board);
-  }
-
-  function isGameOver(uint256 board) public pure returns (bool gameOver) {
-    return Lib2048WarsBoard.isGameOver(board);
+  function getPlayerGameId(address player) public view returns (uint256) {
+    return playerGameId[player];
   }
 
   function getGameStats() public view returns (uint256 totalGames, uint256 nextId) {
     return (totalGamesPlayed, nextGameId);
   }
 
-  function endGame() public {
-    GameSession storage game = playerGames[msg.sender];
-    require(game.isActive, "No active game");
-    
-    game.isActive = false;
-    // Persist final results for the player
-    playerFinalScore[msg.sender] = Lib2048WarsBoard.calculateScore(game.currentBoard);
-    playerFinalMoves[msg.sender] = game.movesPlayed;
-    emit GameOver(msg.sender, game.gameId);
+  /**
+   * @notice Get the last checkpoint data for a player
+   * @param player Player address
+   * @return gameId Game ID of the checkpoint
+   * @return boardHash Board state hash at checkpoint
+   * @return score Score at checkpoint
+   * @return moves Moves played at checkpoint
+   * @return timestamp When checkpoint was saved
+   */
+  function getPlayerCheckpoint(address player) public view returns (
+    uint256 gameId,
+    bytes32 boardHash,
+    uint256 score,
+    uint8 moves,
+    uint256 timestamp
+  ) {
+    return (
+      playerCheckpointGameId[player],
+      playerCheckpointBoardHash[player],
+      playerCheckpointScore[player],
+      playerCheckpointMoves[player],
+      playerCheckpointTime[player]
+    );
+  }
+
+  /**
+   * @notice Check if a player has a valid checkpoint
+   * @param player Player address
+   * @return hasCheckpoint Whether player has a checkpoint
+   */
+  function hasCheckpoint(address player) public view returns (bool) {
+    return playerCheckpointGameId[player] != 0;
+  }
+
+  /**
+   * @notice Verify if a board array matches the stored checkpoint
+   * @param player Player address
+   * @param boardArray Board array to verify
+   * @return isValid Whether the board array matches the checkpoint
+   */
+  function verifyCheckpointBoard(address player, uint8[16] calldata boardArray) public view returns (bool isValid) {
+    bytes32 storedHash = playerCheckpointBoardHash[player];
+    bytes32 providedHash = keccak256(abi.encode(boardArray));
+    return storedHash == providedHash;
   }
 }

@@ -82,6 +82,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
         },
         walletConnectCloudProjectId: undefined,
         defaultChain: wagmiConfig.chains[0],
+        supportedChains: wagmiConfig.chains as any,
       }}
     >
       <QueryClientProvider client={queryClient}>

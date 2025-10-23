@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Play2048Wars: {
-      address: "0x8ce361602b935680e8dec218b820ff5056beb7af",
+      address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
       abi: [
         {
           type: "constructor",
@@ -31,22 +31,31 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "calculateScore",
+          name: "checkpoint",
           inputs: [
             {
-              name: "board",
+              name: "gameId",
               type: "uint256",
               internalType: "uint256",
             },
-          ],
-          outputs: [
+            {
+              name: "boardArray",
+              type: "uint8[16]",
+              internalType: "uint8[16]",
+            },
+            {
+              name: "moves",
+              type: "uint8",
+              internalType: "uint8",
+            },
             {
               name: "score",
               type: "uint256",
               internalType: "uint256",
             },
           ],
-          stateMutability: "pure",
+          outputs: [],
+          stateMutability: "nonpayable",
         },
         {
           type: "function",
@@ -60,13 +69,6 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "endGame",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
         },
         {
           type: "function",
@@ -100,60 +102,6 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "gameSessions",
-          inputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "currentBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "isActive",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "startTime",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "movesPlayed",
-              type: "uint8",
-              internalType: "uint8",
-            },
-          ],
-          stateMutability: "view",
         },
         {
           type: "function",
@@ -224,86 +172,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getGameId",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getGameSession",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "game",
-              type: "tuple",
-              internalType: "struct Play2048Wars.GameSession",
-              components: [
-                {
-                  name: "gameId",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "player",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "initialBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "currentBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "score",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "isActive",
-                  type: "bool",
-                  internalType: "bool",
-                },
-                {
-                  name: "startTime",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "movesPlayed",
-                  type: "uint8",
-                  internalType: "uint8",
-                },
-              ],
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "getGameStats",
           inputs: [],
           outputs: [
@@ -322,30 +190,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getInitialHash",
-          inputs: [
-            {
-              name: "positionTile1",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "positionTile2",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-          ],
-          outputs: [
-            {
-              name: "hash",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
           name: "getNextRoundPool",
           inputs: [],
           outputs: [
@@ -359,7 +203,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getPlayerGame",
+          name: "getPlayerCheckpoint",
           inputs: [
             {
               name: "player",
@@ -369,51 +213,48 @@ const deployedContracts = {
           ],
           outputs: [
             {
-              name: "game",
-              type: "tuple",
-              internalType: "struct Play2048Wars.GameSession",
-              components: [
-                {
-                  name: "gameId",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "player",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "initialBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "currentBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "score",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "isActive",
-                  type: "bool",
-                  internalType: "bool",
-                },
-                {
-                  name: "startTime",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "movesPlayed",
-                  type: "uint8",
-                  internalType: "uint8",
-                },
-              ],
+              name: "gameId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "boardHash",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+            {
+              name: "score",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "moves",
+              type: "uint8",
+              internalType: "uint8",
+            },
+            {
+              name: "timestamp",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPlayerGameId",
+          inputs: [
+            {
+              name: "player",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -433,22 +274,22 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "isGameOver",
+          name: "hasCheckpoint",
           inputs: [
             {
-              name: "board",
-              type: "uint256",
-              internalType: "uint256",
+              name: "player",
+              type: "address",
+              internalType: "address",
             },
           ],
           outputs: [
             {
-              name: "gameOver",
+              name: "",
               type: "bool",
               internalType: "bool",
             },
           ],
-          stateMutability: "pure",
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -529,6 +370,101 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "playerCheckpointBoardHash",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointGameId",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointMoves",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "uint8",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointScore",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointTime",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "playerFinalMoves",
           inputs: [
             {
@@ -567,7 +503,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "playerGames",
+          name: "playerGameId",
           inputs: [
             {
               name: "",
@@ -577,44 +513,9 @@ const deployedContracts = {
           ],
           outputs: [
             {
-              name: "gameId",
+              name: "",
               type: "uint256",
               internalType: "uint256",
-            },
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "currentBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "isActive",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "startTime",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "movesPlayed",
-              type: "uint8",
-              internalType: "uint8",
             },
           ],
           stateMutability: "view",
@@ -640,45 +541,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "processBatchMoves",
-          inputs: [
-            {
-              name: "directions",
-              type: "uint8[]",
-              internalType: "enum Lib2048WarsBoard.MoveDirection[]",
-            },
-            {
-              name: "newTilePositions",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "newTileValues",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "expectedBoards",
-              type: "uint256[]",
-              internalType: "uint256[]",
-            },
-          ],
-          outputs: [
-            {
-              name: "success",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "finalBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
           name: "renounceOwnership",
           inputs: [],
           outputs: [],
@@ -695,25 +557,6 @@ const deployedContracts = {
             },
           ],
           outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "startGame",
-          inputs: [
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
           stateMutability: "nonpayable",
         },
         {
@@ -744,76 +587,17 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "validateBatchMoves",
+          name: "verifyCheckpointBoard",
           inputs: [
             {
-              name: "startBoard",
-              type: "uint256",
-              internalType: "uint256",
+              name: "player",
+              type: "address",
+              internalType: "address",
             },
             {
-              name: "directions",
-              type: "uint8[]",
-              internalType: "enum Lib2048WarsBoard.MoveDirection[]",
-            },
-            {
-              name: "newTilePositions",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "newTileValues",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "expectedBoards",
-              type: "uint256[]",
-              internalType: "uint256[]",
-            },
-          ],
-          outputs: [
-            {
-              name: "isValid",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "errorIndex",
-              type: "uint8",
-              internalType: "uint8",
-            },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "validateMove",
-          inputs: [
-            {
-              name: "previousBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "direction",
-              type: "uint8",
-              internalType: "enum Lib2048WarsBoard.MoveDirection",
-            },
-            {
-              name: "newTilePosition",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "newTileValue",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "nextBoard",
-              type: "uint256",
-              internalType: "uint256",
+              name: "boardArray",
+              type: "uint8[16]",
+              internalType: "uint8[16]",
             },
           ],
           outputs: [
@@ -823,26 +607,7 @@ const deployedContracts = {
               internalType: "bool",
             },
           ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "verifyInitialBoard",
-          inputs: [
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "isValid",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "pure",
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -865,7 +630,7 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "BatchMovesProcessed",
+          name: "CheckpointSaved",
           inputs: [
             {
               name: "player",
@@ -880,13 +645,19 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
-              name: "moveCount",
+              name: "board",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "moves",
               type: "uint8",
               indexed: false,
               internalType: "uint8",
             },
             {
-              name: "finalBoard",
+              name: "score",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
@@ -953,33 +724,27 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "GameStarted",
+          name: "NewRoundStarted",
+          inputs: [],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "NoWinnersInRound",
           inputs: [
             {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
+              name: "round",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
             },
             {
-              name: "initialBoard",
+              name: "poolAmount",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
             },
           ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "NewRoundStarted",
-          inputs: [],
           anonymous: false,
         },
         {
@@ -1051,53 +816,17 @@ const deployedContracts = {
         },
         {
           type: "error",
-          name: "Play2048Wars__BatchValidationFailed",
-          inputs: [
-            {
-              name: "reason",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__GameAlreadyStarted",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__GameNotStarted",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__InvalidBatchSize",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__InvalidInitialBoard",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__NotPlayer",
-          inputs: [],
-        },
-        {
-          type: "error",
           name: "ReentrancyGuardReentrantCall",
           inputs: [],
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 7,
+      deployedOnBlock: 1,
     },
   },
   84532: {
     Play2048Wars: {
-      address: "0xe30f9f7633fa8037cebe55c263949bfbff846312",
+      address: "0xde242eba7d899643491c46c397c7ccb22cc7b573",
       abi: [
         {
           type: "constructor",
@@ -1121,22 +850,31 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "calculateScore",
+          name: "checkpoint",
           inputs: [
             {
-              name: "board",
+              name: "gameId",
               type: "uint256",
               internalType: "uint256",
             },
-          ],
-          outputs: [
+            {
+              name: "boardArray",
+              type: "uint8[16]",
+              internalType: "uint8[16]",
+            },
+            {
+              name: "moves",
+              type: "uint8",
+              internalType: "uint8",
+            },
             {
               name: "score",
               type: "uint256",
               internalType: "uint256",
             },
           ],
-          stateMutability: "pure",
+          outputs: [],
+          stateMutability: "nonpayable",
         },
         {
           type: "function",
@@ -1150,13 +888,6 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "endGame",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
         },
         {
           type: "function",
@@ -1190,60 +921,6 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "gameSessions",
-          inputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "currentBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "isActive",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "startTime",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "movesPlayed",
-              type: "uint8",
-              internalType: "uint8",
-            },
-          ],
-          stateMutability: "view",
         },
         {
           type: "function",
@@ -1314,86 +991,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getGameId",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getGameSession",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "game",
-              type: "tuple",
-              internalType: "struct Play2048Wars.GameSession",
-              components: [
-                {
-                  name: "gameId",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "player",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "initialBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "currentBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "score",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "isActive",
-                  type: "bool",
-                  internalType: "bool",
-                },
-                {
-                  name: "startTime",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "movesPlayed",
-                  type: "uint8",
-                  internalType: "uint8",
-                },
-              ],
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "getGameStats",
           inputs: [],
           outputs: [
@@ -1412,30 +1009,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getInitialHash",
-          inputs: [
-            {
-              name: "positionTile1",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "positionTile2",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-          ],
-          outputs: [
-            {
-              name: "hash",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
           name: "getNextRoundPool",
           inputs: [],
           outputs: [
@@ -1449,7 +1022,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getPlayerGame",
+          name: "getPlayerCheckpoint",
           inputs: [
             {
               name: "player",
@@ -1459,51 +1032,48 @@ const deployedContracts = {
           ],
           outputs: [
             {
-              name: "game",
-              type: "tuple",
-              internalType: "struct Play2048Wars.GameSession",
-              components: [
-                {
-                  name: "gameId",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "player",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "initialBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "currentBoard",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "score",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "isActive",
-                  type: "bool",
-                  internalType: "bool",
-                },
-                {
-                  name: "startTime",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "movesPlayed",
-                  type: "uint8",
-                  internalType: "uint8",
-                },
-              ],
+              name: "gameId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "boardHash",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+            {
+              name: "score",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "moves",
+              type: "uint8",
+              internalType: "uint8",
+            },
+            {
+              name: "timestamp",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPlayerGameId",
+          inputs: [
+            {
+              name: "player",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -1523,22 +1093,22 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "isGameOver",
+          name: "hasCheckpoint",
           inputs: [
             {
-              name: "board",
-              type: "uint256",
-              internalType: "uint256",
+              name: "player",
+              type: "address",
+              internalType: "address",
             },
           ],
           outputs: [
             {
-              name: "gameOver",
+              name: "",
               type: "bool",
               internalType: "bool",
             },
           ],
-          stateMutability: "pure",
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -1619,6 +1189,101 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "playerCheckpointBoardHash",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointGameId",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointMoves",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "uint8",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointScore",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerCheckpointTime",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "playerFinalMoves",
           inputs: [
             {
@@ -1657,7 +1322,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "playerGames",
+          name: "playerGameId",
           inputs: [
             {
               name: "",
@@ -1667,44 +1332,9 @@ const deployedContracts = {
           ],
           outputs: [
             {
-              name: "gameId",
+              name: "",
               type: "uint256",
               internalType: "uint256",
-            },
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "currentBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "isActive",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "startTime",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "movesPlayed",
-              type: "uint8",
-              internalType: "uint8",
             },
           ],
           stateMutability: "view",
@@ -1730,45 +1360,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "processBatchMoves",
-          inputs: [
-            {
-              name: "directions",
-              type: "uint8[]",
-              internalType: "enum Lib2048WarsBoard.MoveDirection[]",
-            },
-            {
-              name: "newTilePositions",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "newTileValues",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "expectedBoards",
-              type: "uint256[]",
-              internalType: "uint256[]",
-            },
-          ],
-          outputs: [
-            {
-              name: "success",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "finalBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
           name: "renounceOwnership",
           inputs: [],
           outputs: [],
@@ -1785,25 +1376,6 @@ const deployedContracts = {
             },
           ],
           outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "startGame",
-          inputs: [
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
           stateMutability: "nonpayable",
         },
         {
@@ -1834,76 +1406,17 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "validateBatchMoves",
+          name: "verifyCheckpointBoard",
           inputs: [
             {
-              name: "startBoard",
-              type: "uint256",
-              internalType: "uint256",
+              name: "player",
+              type: "address",
+              internalType: "address",
             },
             {
-              name: "directions",
-              type: "uint8[]",
-              internalType: "enum Lib2048WarsBoard.MoveDirection[]",
-            },
-            {
-              name: "newTilePositions",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "newTileValues",
-              type: "uint8[]",
-              internalType: "uint8[]",
-            },
-            {
-              name: "expectedBoards",
-              type: "uint256[]",
-              internalType: "uint256[]",
-            },
-          ],
-          outputs: [
-            {
-              name: "isValid",
-              type: "bool",
-              internalType: "bool",
-            },
-            {
-              name: "errorIndex",
-              type: "uint8",
-              internalType: "uint8",
-            },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "validateMove",
-          inputs: [
-            {
-              name: "previousBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "direction",
-              type: "uint8",
-              internalType: "enum Lib2048WarsBoard.MoveDirection",
-            },
-            {
-              name: "newTilePosition",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "newTileValue",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "nextBoard",
-              type: "uint256",
-              internalType: "uint256",
+              name: "boardArray",
+              type: "uint8[16]",
+              internalType: "uint8[16]",
             },
           ],
           outputs: [
@@ -1913,26 +1426,7 @@ const deployedContracts = {
               internalType: "bool",
             },
           ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "verifyInitialBoard",
-          inputs: [
-            {
-              name: "initialBoard",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "isValid",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "pure",
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -1955,7 +1449,7 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "BatchMovesProcessed",
+          name: "CheckpointSaved",
           inputs: [
             {
               name: "player",
@@ -1970,13 +1464,19 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
-              name: "moveCount",
+              name: "board",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "moves",
               type: "uint8",
               indexed: false,
               internalType: "uint8",
             },
             {
-              name: "finalBoard",
+              name: "score",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
@@ -2043,33 +1543,27 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "GameStarted",
+          name: "NewRoundStarted",
+          inputs: [],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "NoWinnersInRound",
           inputs: [
             {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
+              name: "round",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
             },
             {
-              name: "initialBoard",
+              name: "poolAmount",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
             },
           ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "NewRoundStarted",
-          inputs: [],
           anonymous: false,
         },
         {
@@ -2141,48 +1635,12 @@ const deployedContracts = {
         },
         {
           type: "error",
-          name: "Play2048Wars__BatchValidationFailed",
-          inputs: [
-            {
-              name: "reason",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__GameAlreadyStarted",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__GameNotStarted",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__InvalidBatchSize",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__InvalidInitialBoard",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "Play2048Wars__NotPlayer",
-          inputs: [],
-        },
-        {
-          type: "error",
           name: "ReentrancyGuardReentrantCall",
           inputs: [],
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 32734074,
+      deployedOnBlock: 32744282,
     },
   },
 } as const;

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSendTransaction, useWallets } from "@privy-io/react-auth";
 import toast from "react-hot-toast";
-import { encodeFunctionData } from "viem";
+import { encodeFunctionData, parseEther } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import deployedContracts from "~~/contracts/deployedContracts";
 
@@ -64,14 +64,12 @@ export const useSeamlessTransactions = () => {
   /**
    * Submit game win seamlessly
    */
-  const submitGameWin = async (gameId: bigint, score: bigint, moves: bigint) => {
+  const gameWon = async (gameId: bigint, score: bigint, moves: bigint) => {
     if (!address) throw new Error("No address available");
 
-    // Get contract address and ABI from deployed contracts
     const contract = deployedContracts[84532].Play2048Wars;
     const contractAddress = contract.address as `0x${string}`;
 
-    // Encode gameWon function call using viem
     const data = encodeFunctionData({
       abi: contract.abi,
       functionName: "gameWon",
@@ -84,12 +82,10 @@ export const useSeamlessTransactions = () => {
   /**
    * Submit game loss seamlessly
    */
-  const submitGameLoss = async (gameId: bigint) => {
-    // Get contract address and ABI from deployed contracts
+  const gameLost = async (gameId: bigint) => {
     const contract = deployedContracts[84532].Play2048Wars;
     const contractAddress = contract.address as `0x${string}`;
 
-    // Encode gameLost function call using viem
     const data = encodeFunctionData({
       abi: contract.abi,
       functionName: "gameLost",
@@ -99,9 +95,88 @@ export const useSeamlessTransactions = () => {
     return await sendSeamlessTransaction(contractAddress, data);
   };
 
+  /**
+   * Enter the game and become a registered player
+   */
+  const enterGame = async () => {
+    try {
+      toast.loading("Entering game...", { id: "enter-game" });
+      const contract = deployedContracts[84532].Play2048Wars;
+      const contractAddress = contract.address as `0x${string}`;
+
+      const data = encodeFunctionData({
+        abi: contract.abi,
+        functionName: "enterGame",
+        args: [],
+      });
+
+      const result = await sendSeamlessTransaction(contractAddress, data, parseEther("0.001"));
+      toast.success("Successfully entered the game!", { id: "enter-game" });
+      return result;
+    } catch (error) {
+      toast.error("Failed to enter game", { id: "enter-game" });
+      throw error;
+    }
+  };
+
+  /**
+   * Save game checkpoint for recovery
+   * Tracks current board array, moves, score, gameId for browser restoration
+   */
+  const checkpoint = async (gameId: bigint, boardArray: number[], moves: number, score: number) => {
+    try {
+      toast.loading("Saving checkpoint...", { id: "checkpoint" });
+      const contract = deployedContracts[84532].Play2048Wars;
+      const contractAddress = contract.address as `0x${string}`;
+
+      // Convert board array to uint8[16] format
+      const boardUint8 = new Uint8Array(16);
+      for (let i = 0; i < Math.min(boardArray.length, 16); i++) {
+        boardUint8[i] = boardArray[i];
+      }
+
+      const data = encodeFunctionData({
+        abi: contract.abi,
+        functionName: "checkpoint",
+        args: [
+          gameId,
+          Array.from(boardUint8) as [
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+            number,
+          ],
+          moves,
+          BigInt(score),
+        ],
+      });
+
+      const result = await sendSeamlessTransaction(contractAddress, data);
+      toast.success("Checkpoint saved!", { id: "checkpoint" });
+      return result;
+    } catch (error) {
+      toast.error("Failed to save checkpoint", { id: "checkpoint" });
+      throw error;
+    }
+  };
+
   return {
-    submitGameWin,
-    submitGameLoss,
+    enterGame,
+    gameWon,
+    gameLost,
+    checkpoint,
     isLoading,
     hasEmbeddedWallet: !!embeddedWallet,
   };

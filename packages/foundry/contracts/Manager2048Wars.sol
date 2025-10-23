@@ -22,11 +22,14 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
   event WinnerAssigned(address indexed player);
   event GameEntered(address indexed player);
   event NewRoundStarted();
+  event NoWinnersInRound(uint256 indexed round, uint256 poolAmount);
 
   uint256 public currentRound;
   uint256 public nextRoundStart;
 
   constructor(uint256 _entryFee, address _owner) Ownable(_owner) {
+    require(_owner != address(0), "Owner cannot be zero address");
+    require(_entryFee > 0, "Entry fee must be greater than 0");
     entryFee = _entryFee; // 0.001 ether per game
     nextRoundStart = block.timestamp + 1 weeks; // each round lasts 1 week
     currentRound = 1;
@@ -45,12 +48,19 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
    */
   function startNewRound() internal {
     require(block.timestamp > nextRoundStart, "Next round not started");
-    require(winnersList.length > 0, "No winners to distribute to");
 
-    // Distribute pool before starting new round
-    distributePool();
+    // Distribute pool before starting new round (only if there are winners)
+    if (winnersList.length > 0) {
+      distributePool();
+    } else {
+      // If no winners, roll the current round pool into next round
+      // This prevents funds from being locked forever
+      uint256 currentPool = address(this).balance / 2;
+      emit NoWinnersInRound(currentRound, currentPool);
+      // Pool automatically rolls to next round (no action needed)
+    }
 
-    nextRoundStart = block.timestamp + 1 weeks;
+    nextRoundStart = block.timestamp + 1 weeks; // Fixed: should be 1 week, not 1 hour
     currentRound++;
     emit NewRoundStarted();
   }
@@ -68,12 +78,7 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
       startNewRound();
     }
 
-    (bool success, ) = payable(address(this)).call{ value: msg.value }("");
-    if (success) {
-      assignRoleToPlayer(msg.sender);
-    } else {
-      revert("Failed to enter game");
-    }
+    assignRoleToPlayer(msg.sender);
     emit GameEntered(msg.sender);
   }
 
@@ -103,7 +108,10 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
     require(winnersList.length > 0, "No winners to distribute to");
 
     uint256 pool = getCurrentRoundPool();
+    require(pool > 0, "No pool to distribute");
+    
     uint256 amountPerWinner = pool / winnersList.length;
+    require(amountPerWinner > 0, "Amount per winner too small");
 
     for (uint256 i = 0; i < winnersList.length; i++) {
       payable(winnersList[i]).transfer(amountPerWinner);

@@ -1,5 +1,6 @@
 import { PropsWithChildren, createContext, useCallback, useEffect, useReducer, useRef } from "react";
 import { gameWinTileValue, mergeAnimationDuration, tileCountPerDimension } from "../constants";
+import { useSeamlessTransactions } from "../hooks/useSeamlessTransactions";
 import { Tile } from "../models/tile";
 import gameReducer, { initialState } from "../reducers/game-reducer";
 import { isNil } from "lodash";
@@ -13,12 +14,16 @@ export const GameContext = createContext({
   positionId: 1,
   moveTiles: (_direction: MoveDirection) => {},
   getTiles: () => [] as Tile[],
-  startGame: () => {},
+  startGame: (_gameId?: bigint) => {},
+  manualCheckpoint: () => {},
+  gameId: null as bigint | null,
 });
 
 export default function GameProvider({ children }: PropsWithChildren) {
   const [gameState, dispatch] = useReducer(gameReducer, initialState);
   const gameStateRef = useRef(gameState);
+  const { checkpoint, hasEmbeddedWallet } = useSeamlessTransactions();
+  const gameIdRef = useRef<bigint | null>(null);
 
   const getEmptyCells = useCallback(() => {
     const results: [number, number][] = [];
@@ -45,9 +50,49 @@ export default function GameProvider({ children }: PropsWithChildren) {
     }
   }, [getEmptyCells]);
 
-  const getTiles = () => {
+  const getTiles = useCallback(() => {
     return gameState.tilesByIds.map(tileId => gameState.tiles[tileId]).filter(Boolean);
-  };
+  }, [gameState.tilesByIds, gameState.tiles]);
+
+  // Convert board to array format for checkpoint
+  const boardToArray = useCallback(() => {
+    const boardArray = new Array(16).fill(0);
+    const tiles = getTiles();
+
+    tiles.forEach(tile => {
+      const [x, y] = tile.position;
+      const index = y * 4 + x;
+      boardArray[index] = tile.value;
+    });
+
+    return boardArray;
+  }, [getTiles]);
+
+  // Auto-checkpoint every 10 moves
+  const autoCheckpoint = useCallback(async () => {
+    if (!hasEmbeddedWallet || !gameIdRef.current) return;
+
+    try {
+      const boardArray = boardToArray();
+      await checkpoint(gameIdRef.current, boardArray, gameState.moves, gameState.score);
+      console.log(`Checkpoint saved at move ${gameState.moves}`);
+    } catch (error) {
+      console.error("Failed to save checkpoint:", error);
+    }
+  }, [hasEmbeddedWallet, boardToArray, checkpoint, gameState.moves, gameState.score]);
+
+  // Manual checkpoint function
+  const manualCheckpoint = useCallback(async () => {
+    if (!hasEmbeddedWallet || !gameIdRef.current) return;
+
+    try {
+      const boardArray = boardToArray();
+      await checkpoint(gameIdRef.current, boardArray, gameState.moves, gameState.score);
+      console.log(`Manual checkpoint saved at move ${gameState.moves}`);
+    } catch (error) {
+      console.error("Failed to save manual checkpoint:", error);
+    }
+  }, [hasEmbeddedWallet, boardToArray, checkpoint, gameState.moves, gameState.score]);
 
   const moveTiles = useCallback(
     (type: MoveDirection) => {
@@ -63,8 +108,14 @@ export default function GameProvider({ children }: PropsWithChildren) {
    * @notice: this is the initial state for the game
    * @notice: this will not manage the randomness for the creation of new tiles after every move
    */
-  const startGame = () => {
+  const startGame = (gameId?: bigint) => {
     dispatch({ type: "RESET_GAME" });
+
+    // Set game ID for checkpoint functionality
+    if (gameId) {
+      gameIdRef.current = gameId;
+    }
+
     // Generate all possible positions on the board
     const allPositions: [number, number][] = [];
     for (let x = 0; x < 4; x++) {
@@ -89,6 +140,13 @@ export default function GameProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
+
+  // Auto-checkpoint when moves reach multiples of 10
+  useEffect(() => {
+    if (gameState.moves > 0 && gameState.moves % 10 === 0) {
+      autoCheckpoint();
+    }
+  }, [gameState.moves, autoCheckpoint]);
 
   const checkGameState = useCallback(() => {
     const currentState = gameStateRef.current;
@@ -150,6 +208,8 @@ export default function GameProvider({ children }: PropsWithChildren) {
         getTiles,
         moveTiles,
         startGame,
+        manualCheckpoint,
+        gameId: gameIdRef.current,
       }}
     >
       {children}
