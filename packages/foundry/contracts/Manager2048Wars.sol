@@ -133,11 +133,10 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
   }
 
   function getTimeRemainingOfCurrentRound() public view returns (uint256) {
-    uint256 timeRemaining = nextRoundStart - block.timestamp;
-    if (timeRemaining < 0) {
+    if (block.timestamp >= nextRoundStart) {
       return 0;
     }
-    return timeRemaining;
+    return nextRoundStart - block.timestamp;
   }
 
   function getCurrentRoundPool() public view returns (uint256) {

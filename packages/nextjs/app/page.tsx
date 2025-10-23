@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Moves from "../components/2048components/moves";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import Board from "~~/components/2048components/board";
@@ -10,6 +9,7 @@ import CurrentPool from "~~/components/2048components/currentPool";
 import NextPool from "~~/components/2048components/nextPool";
 import Score from "~~/components/2048components/score";
 import EnterGameButton from "~~/components/enterGameButton";
+import { PrivyConnectButton } from "~~/components/scaffold-eth";
 import GameProvider from "~~/context/game-context";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import "~~/styles/2048styles/globals.css";
@@ -43,7 +43,7 @@ const Home: NextPage = () => {
         <main>
           {!connectedAddress && (
             <div className="flex justify-center">
-              <ConnectButton />
+              <PrivyConnectButton />
             </div>
           )}
           {connectedAddress && (

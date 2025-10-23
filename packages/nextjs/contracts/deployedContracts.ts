@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Play2048Wars: {
-      address: "0x82dc47734901ee7d4f4232f398752cb9dd5daccc",
+      address: "0x8ce361602b935680e8dec218b820ff5056beb7af",
       abi: [
         {
           type: "constructor",
@@ -1092,12 +1092,12 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 30,
+      deployedOnBlock: 7,
     },
   },
   84532: {
     Play2048Wars: {
-      address: "0x657295981f2bac074d1144251b41276018292655",
+      address: "0xe30f9f7633fa8037cebe55c263949bfbff846312",
       abi: [
         {
           type: "constructor",
@@ -2182,7 +2182,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 32420148,
+      deployedOnBlock: 32734074,
     },
   },
 } as const;
