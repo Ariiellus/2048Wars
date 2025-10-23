@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { getAddress } from "viem";
-import { Address } from "viem";
 import { useBalance } from "wagmi";
 import {
   ArrowLeftOnRectangleIcon,
@@ -15,9 +14,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
-import { getTargetNetworks } from "~~/utils/scaffold-eth";
-
-const allowedNetworks = getTargetNetworks();
 
 export const PrivyConnectButton = () => {
   const { ready, authenticated, login, logout } = usePrivy();
