@@ -83,12 +83,12 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
 
       if (transactionReceipt.status === "reverted") throw new Error("Transaction reverted");
 
-      notification.success(
-        <TxnNotification message="Transaction completed successfully!" blockExplorerLink={blockExplorerTxURL} />,
-        {
-          icon: "🎉",
-        },
-      );
+      // notification.success(
+      //   <TxnNotification message="Transaction completed successfully!" blockExplorerLink={blockExplorerTxURL} />,
+      //   {
+      //     icon: "🎉",
+      //   },
+      // );
 
       if (options?.onBlockConfirmation) options.onBlockConfirmation(transactionReceipt);
     } catch (error: any) {
