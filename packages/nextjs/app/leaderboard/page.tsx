@@ -89,7 +89,7 @@ const Leaderboard: NextPage = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2">🏆 2048Wars Leaderboard</h1>
-          <p className="text-lg text-gray-600">Compete for the highest score and claim your place on the blockchain!</p>
+          <p className="text-lg text-gray-600">Compete for a share of the prize pool by achieving the highest score!</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
