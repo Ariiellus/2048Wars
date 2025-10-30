@@ -5,7 +5,7 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title 2048Wars V1
+ * @title 2048Wars Manager Contract
  * @notice This contract is used to manage the entrance and distribute funds to winners
  * @notice 50% of entrance fees goes to a pool that is distributed to winners each week
  * @notice 50% remain for the next round
@@ -24,15 +24,15 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
   event NewRoundStarted();
   event NoWinnersInRound(uint256 indexed round, uint256 poolAmount);
 
-  uint256 public currentRound;
+  uint256 public roundNumber;
   uint256 public nextRoundStart;
 
   constructor(uint256 _entryFee, address _owner) Ownable(_owner) {
     require(_owner != address(0), "Owner cannot be zero address");
     require(_entryFee > 0, "Entry fee must be greater than 0");
     entryFee = _entryFee; // 0.001 ether per game
-    nextRoundStart = block.timestamp + 1 weeks; // each round lasts 1 week
-    currentRound = 1;
+    nextRoundStart = block.timestamp + 15 minutes; // each round lasts 15 minutes
+    roundNumber = 1;
   }
 
   /// Entrance Conditions
@@ -56,12 +56,12 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
       // If no winners, roll the current round pool into next round
       // This prevents funds from being locked forever
       uint256 currentPool = address(this).balance / 2;
-      emit NoWinnersInRound(currentRound, currentPool);
+      emit NoWinnersInRound(roundNumber, currentPool);
       // Pool automatically rolls to next round (no action needed)
     }
 
-    nextRoundStart = block.timestamp + 1 weeks; // Fixed: should be 1 week, not 1 hour
-    currentRound++;
+    nextRoundStart = block.timestamp + 15 minutes; // Fixed: should be 1 week, not 1 hour
+    roundNumber++;
     emit NewRoundStarted();
   }
 

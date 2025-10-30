@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     config.ignoreWarnings = [{ module: /node_modules\/@privy-io/ }];
     return config;
   },
+  transpilePackages: ["@coinbase/wallet-sdk"],
 };
 
 const isIpfs = process.env.NEXT_PUBLIC_IPFS_BUILD === "true";

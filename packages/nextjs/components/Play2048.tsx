@@ -3,13 +3,13 @@
 // Hooks
 import { useEffect, useRef, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
-import { useTransactions } from "../hooks/useTransactions";
+import { useTransactions } from "~~/hooks/useTransactions";
 
 // UI
-import Board from "../components/Board";
-import Container from "../components/Container";
-import Scorecard from "../components/Scorecard";
-import LoginButton from "../components/LoginButton";
+import Board from "~~/components/Board";
+import Container from "~~/components/Container";
+import Scorecard from "~~/components/Scorecard";
+import LoginButton from "~~/components/LoginButton";
 import { Toaster } from "~~/components/ui/sonner";
 
 // Utils
@@ -22,7 +22,7 @@ import {
     toBytes,
     toHex,
 } from "viem";
-import { FaucetDialog } from "../components/FaucetDialog";
+import { FaucetDialog } from "~~/components/FaucetDialog";
 
 // Types
 enum Direction {

@@ -16,16 +16,20 @@ import "~~/styles/2048styles/globals.css";
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [isGameLoading, setIsGameLoading] = useState(false);
-  const { data: isPlayer, refetch: refetchIsPlayer } = useScaffoldReadContract({
-    contractName: "Monad2048",
-    functionName: "gameHashOf",
+  const { data: playerGameId } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getPlayerGameId",
     args: [connectedAddress as `0x${string}`] as const,
   });
+
+  // Check if player has an active game (playerGameId > 0)
+  const hasActiveGame = playerGameId && BigInt(playerGameId) > 0n;
 
   const handleGameEntered = async () => {
     setIsGameLoading(true);
     setTimeout(async () => {
-      await refetchIsPlayer();
+      // Wait a bit for the transaction to be confirmed
+      await new Promise(resolve => setTimeout(resolve, 2000));
       setIsGameLoading(false);
     }, 2000);
   };
@@ -45,7 +49,7 @@ const Home: NextPage = () => {
         )}
         {connectedAddress && (
           <>
-            {!isPlayer && !isGameLoading && (
+            {!hasActiveGame && !isGameLoading && (
               <div className="flex justify-center">
                 <EnterGameButton onGameEntered={handleGameEntered} />
               </div>
@@ -61,7 +65,7 @@ const Home: NextPage = () => {
                 </p>
               </div>
             )}
-            {isPlayer && !isGameLoading && (
+            {hasActiveGame && !isGameLoading && (
               <>
                 <div className="grid grid-cols-2 gap-4">
                   {/* <Moves /> */}

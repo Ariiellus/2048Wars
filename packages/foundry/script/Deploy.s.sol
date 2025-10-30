@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./DeployHelpers.s.sol";
-import { Monad2048 } from "../contracts/Monad2048.sol";
+import { Play2048Wars } from "../contracts/Play2048Wars.sol";
 
 
 /**
@@ -22,7 +22,7 @@ contract DeployScript is ScaffoldETHDeploy {
      *      - Export contract addresses & ABIs to `nextjs` packages
      */
     function run() external ScaffoldEthDeployerRunner {
-        Monad2048 game = new Monad2048();
-        deployments.push(Deployment({ name: "Monad2048", addr: address(game) }));
+        Play2048Wars game = new Play2048Wars(0.001 ether, deployer);
+        deployments.push(Deployment({ name: "Play2048Wars", addr: address(game) }));
     }
 }

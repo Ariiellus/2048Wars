@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
-import CurrentPool from "../ex-components/2048components/currentPool";
-import NextPool from "../ex-components/2048components/nextPool";
-import { formatEther } from "viem";
-import { useAccount, useBalance, usePublicClient } from "wagmi";
-import deployedContracts from "~~/contracts/deployedContracts";
+// import CurrentPool from "./2048components/currentPool";
+// import NextPool from "./2048components/nextPool";
+import { formatEther, parseEther } from "viem";
+import { useAccount, useBalance } from "wagmi";
+import Board from "~~/components/Board";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
-// import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 
 interface EnterGameButtonProps {
   heading?: string;
@@ -14,38 +14,41 @@ interface EnterGameButtonProps {
 }
 
 export default function EnterGameButton({ heading = "Can you make it to 2048?", onGameEntered }: EnterGameButtonProps) {
-   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { address } = useAccount();
-  const publicClient = usePublicClient();
 
   const { data: balance } = useBalance({
     address: address,
   });
 
-  // Temporarily disabled to avoid undefined references during development
-  // const { data: entryFee } = useScaffoldReadContract({
-  //   contractName: "Monad2048",
-  //   functionName: "gameHashOf",
-  //   args: [gameHash],
-  // });
-  const entryFee: bigint | undefined = undefined;
+  const { data: entryFee } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getEntryFee",
+  });
 
-  // Placeholder flag to avoid undefined variable errors
-  const hasInsufficientFunds = false;
+  const { writeContractAsync: writePlay2048WarsAsync } = useScaffoldWriteContract({
+    contractName: "Play2048Wars",
+  });
+
+  // Check if user has enough ETH for entry fee + gas (0.0015 ETH total)
+  const requiredAmount = parseEther("0.0015");
+  const hasInsufficientFunds = balance && BigInt(balance.value) < requiredAmount;
 
   const handleEnterGame = async () => {
     if (!entryFee) return;
+
     try {
       setIsLoading(true);
-      // Skipping contract interactions during development
-      const gameId: bigint | undefined = undefined;
+      await writePlay2048WarsAsync({
+        functionName: "enterGame",
+        value: BigInt(entryFee),
+      });
 
       if (onGameEntered) {
         onGameEntered();
       }
     } catch (error) {
       console.error("Failed to enter game:", error);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -58,8 +61,8 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
         {balance && entryFee && (
           <div className="mb-8">
             <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
-              <CurrentPool />
-              <NextPool />
+              {/* <CurrentPool />
+              <NextPool /> */}
             </div>
           </div>
         )}
@@ -71,7 +74,7 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
               You need at least 0.0015 ETH to enter the game (0.001 ETH entry fee + 0.0005 ETH gas).
             </p>
             <p className="text-xs text-red-600 mt-1">
-              Current balance: {balance ? formatEther(balance.value) : "0"} ETH
+              Current balance: {balance ? formatEther(BigInt(balance.value)) : "0"} ETH
             </p>
           </div>
         )}
@@ -93,7 +96,7 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Entry fee: <span className="font-semibold text-gray-800">{formatEther(entryFee ?? 0n)} ETH</span>
+              Entry fee: <span className="font-semibold text-gray-800">{formatEther(BigInt(entryFee || "0"))} ETH</span>
             </p>
           </div>
         </div>
