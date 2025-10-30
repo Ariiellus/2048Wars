@@ -8,8 +8,8 @@ import { useTransactions } from "~~/hooks/useTransactions";
 // UI
 import Board from "~~/components/Board";
 import Container from "~~/components/Container";
-import Scorecard from "~~/components/Scorecard";
-import LoginButton from "~~/components/LoginButton";
+import Score from "~~/components/score";
+import Moves from "~~/components/moves";
 import { Toaster } from "~~/components/ui/sonner";
 
 // Utils
@@ -369,6 +369,13 @@ export default function Game2048() {
 
         setAddress((privyUser as any).address);
     }, [user]);
+
+    // Auto-initialize game when address is available and board is empty
+    useEffect(() => {
+        if (address && boardState.tiles.length === 0 && !gameOver && !gameError && !isAnimating) {
+            initializeGame();
+        }
+    }, [address, boardState.tiles.length, gameOver, gameError, isAnimating]);
 
     // Initialize the game with two random tiles
     const initializeGame = () => {
@@ -737,12 +744,12 @@ export default function Game2048() {
     return (
         <Container>
             <div className="flex flex-col flex-1">
-                <div className="flex items-center justify-between w-full max-w-md mx-auto mb-2 p-4">
-                    <Scorecard score={boardState.score} />
-                    <LoginButton resetGame={initializeGame} />
+                <div className="grid grid-cols-2 gap-4">
+                    <Score score={boardState.score} />
+                    <Moves moves={playedMovesCount} />
                 </div>
 
-                <div className="flex-1 overflow-auto px-2">
+                <div className="flex justify-center mt-4">
                     <Board
                         containerRef={gameContainerRef}
                         tiles={boardState.tiles}

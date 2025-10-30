@@ -139,22 +139,6 @@ export function useTransactions() {
 
       // Fire toast info with benchmark and transaction hash.
       console.log(`Transaction sent in ${time} ms: ${transactionHash}`);
-      toast.info(`Sent transaction.`, {
-        description: `${successText} Time: ${time} ms`,
-        action: (
-          <Button
-            className="outline outline-white"
-            onClick={() =>
-              window.open(`https://sepolia.basescan.org/tx/${transactionHash}`, "_blank", "noopener,noreferrer")
-            }
-          >
-            <div className="flex items-center gap-1 p-1">
-              <p>View</p>
-              <ExternalLink className="w-4 h-4" />
-            </div>
-          </Button>
-        ),
-      });
 
       // Confirm transaction
       const receipt = await waitForTransactionReceipt(publicClient, {

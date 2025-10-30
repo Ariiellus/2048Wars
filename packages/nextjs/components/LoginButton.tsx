@@ -55,69 +55,6 @@ export default function LoginButton({ resetGame }: LoginButtonProps) {
         setAddress((privyUser as any).address);
     }, [user]);
 
-    const handleFaucetRequest = async () => {
-        if (!user) {
-            toast.error("Please log-in.");
-            return;
-        }
-
-        const [privyUser] = user.linkedAccounts.filter(
-            (account) =>
-                account.type === "wallet" &&
-                account.walletClientType === "privy"
-        );
-        if (!privyUser || !(privyUser as any).address) {
-            toast.error("Embedded wallet not found.");
-            return;
-        }
-        const privyUserAddress = (privyUser as any).address;
-
-        const balance = await publicClient.getBalance({
-            address: privyUserAddress as Hex,
-        });
-        if (parseFloat(formatEther(balance)) >= 0.01) {
-            toast.info("Player has enough ETH to play.");
-            return;
-        }
-
-        const faucetUrl = process.env.NEXT_PUBLIC_FAUCET_URL;
-        if (!faucetUrl) {
-            toast.error("Faucet URL not configured.");
-            return;
-        }
-
-        setFaucetLoading(true);
-
-        try {
-            const response = await post({
-                url: faucetUrl,
-                params: {
-                    address: privyUserAddress,
-                },
-            });
-
-            const transactionHash = response.txHash;
-            console.log("Funded tx: ", transactionHash);
-
-            toast.success(`Player funded!`, {
-                description: `Funded player with 0.01 ETH from faucet.`,
-            });
-        } catch (e) {
-            console.log((e as any).message);
-            console.log("Error fetching testnet ETH: ", e);
-            toast.info(`You'll need ETH to play this game.`, {
-                description: `Continue playing and try the in-game faucet or fund directly.`,
-            });
-        }
-
-        setFaucetLoading(false);
-    };
-
-    useEffect(() => {
-        if (!user) return;
-        handleFaucetRequest();
-    }, [user]);
-
     const copyToClipboard = async () => {
         if (address) {
             await navigator.clipboard.writeText(address);
@@ -136,30 +73,9 @@ export default function LoginButton({ resetGame }: LoginButtonProps) {
                     <FunPurpleButton
                         text="New Game"
                         onClick={resetGame}
-                        loadingText="Funding player..."
+                            loadingText="Funding player..."
                         isLoading={faucetLoading}
                     />
-                    <Button
-                        variant="ghost"
-                        className="underline mt-1"
-                        onClick={logout}
-                    >
-                        Logout
-                    </Button>
-                    <div className="flex items-center gap-2">
-                        <p>
-                            <span className="font-bold">Player</span>:{" "}
-                            {abbreviatedAddress}
-                        </p>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 p-1"
-                            onClick={copyToClipboard}
-                        >
-                            <Copy className="h-4 w-4" />
-                        </Button>
-                    </div>
                 </div>
             ) : (
                 <FunPurpleButton

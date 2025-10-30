@@ -6,9 +6,9 @@ type ContainerProps = {
 
 export default function Container({ children }: ContainerProps) {
     return (
-        <div className="min-h-[100dvh] flex flex-col items-center pb-16 pt-6 justify-between px-2 bg-gray-100 overflow-hidden">
+        <div className="w-full max-w-md mx-auto p-2">
             {/* Main content area */}
-            <div className="flex-1 w-full max-w-md flex flex-col justify-between overflow-hidden">
+            <div className="flex-1 w-full max-w-md flex flex-col">
                 {children}
             </div>
         </div>

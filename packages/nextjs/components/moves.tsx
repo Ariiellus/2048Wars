@@ -1,10 +1,10 @@
-import { useContext } from "react";
-import { GameContext } from "~~/context/game-context";
 import styles from "~~/styles/2048styles/counter.module.css";
 
-export default function Moves() {
-  const { moves } = useContext(GameContext);
+type MovesProps = {
+  moves: number;
+};
 
+export default function Moves({ moves }: MovesProps) {
   return (
     <div className={styles.moves}>
       Moves

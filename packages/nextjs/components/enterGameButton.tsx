@@ -1,16 +1,13 @@
-import { useContext, useState } from "react";
-// import CurrentPool from "./2048components/currentPool";
-// import NextPool from "./2048components/nextPool";
+import { useState } from "react";
 import { formatEther, parseEther } from "viem";
 import { useAccount, useBalance } from "wagmi";
-import Board from "~~/components/Board";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 
 interface EnterGameButtonProps {
   heading?: string;
   type?: string;
-  onGameEntered?: () => void;
+  onGameEntered: () => void;
 }
 
 export default function EnterGameButton({ heading = "Can you make it to 2048?", onGameEntered }: EnterGameButtonProps) {
@@ -57,15 +54,6 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
     <div className="flex flex-col items-center justify-center p-8 bg-white rounded-2xl shadow-lg border border-gray-100 max-w-md mx-auto">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">{heading}</h1>
-
-        {balance && entryFee && (
-          <div className="mb-8">
-            <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
-              {/* <CurrentPool />
-              <NextPool /> */}
-            </div>
-          </div>
-        )}
 
         {hasInsufficientFunds && (
           <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">

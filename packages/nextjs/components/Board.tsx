@@ -1,3 +1,4 @@
+import tileStyles from "~~/styles/2048styles/tile.module.css";
 import FunPurpleButton from "./FunPurpleButton";
 
 type Tile = {
@@ -44,29 +45,29 @@ export default function Board({
     const getTileColor = (value: number) => {
         switch (value) {
             case 2:
-                return "bg-purple-100 text-gray-800";
+                return tileStyles.tile2;
             case 4:
-                return "bg-purple-200 text-gray-800";
+                return tileStyles.tile4;
             case 8:
-                return "bg-purple-300 text-gray-800";
+                return tileStyles.tile8;
             case 16:
-                return "bg-purple-400 text-white";
+                return tileStyles.tile16;
             case 32:
-                return "bg-purple-500 text-white";
+                return tileStyles.tile32;
             case 64:
-                return "bg-purple-600 text-white";
+                return tileStyles.tile64;
             case 128:
-                return "bg-amber-300 text-gray-800";
+                return tileStyles.tile128;
             case 256:
-                return "bg-amber-400 text-white";
+                return tileStyles.tile256;
             case 512:
-                return "bg-amber-500 text-white";
+                return tileStyles.tile512;
             case 1024:
-                return "bg-amber-600 text-white";
+                return tileStyles.tile1024;
             case 2048:
-                return "bg-amber-700 text-white";
+                return tileStyles.tile2048;
             default:
-                return "bg-purple-800 text-white";
+                return "";
         }
     };
 
@@ -81,7 +82,8 @@ export default function Board({
         <>
             <div
                 ref={containerRef}
-                className="relative bg-gray-300 rounded-lg p-2 w-full max-w-md aspect-square"
+                className="relative rounded-lg p-2 w-full max-w-md aspect-square"
+                style={{ backgroundColor: "var(--secondary-background)" }}
             >
                 {/* Grid background */}
                 <div className="grid grid-cols-4 grid-rows-4 gap-2 h-full w-full">
@@ -90,7 +92,8 @@ export default function Board({
                         .map((_, index) => (
                             <div
                                 key={`cell-${index}`}
-                                className="bg-gray-200 rounded-md"
+                                className="rounded-md"
+                                style={{ backgroundColor: "var(--cell-background)" }}
                             />
                         ))}
                 </div>
@@ -127,22 +130,6 @@ export default function Board({
                         </span>
                     </div>
                 ))}
-
-                {/* Game over overlay */}
-                {gameOver && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-lg z-20">
-                        <div className="p-6 bg-white rounded-lg text-center">
-                            <h2 className="text-2xl font-bold mb-4">
-                                Game Over!
-                            </h2>
-                            <p className="mb-4">Your score: {score}</p>
-                            <FunPurpleButton
-                                text="Play Again"
-                                onClick={initializeGame}
-                            />
-                        </div>
-                    </div>
-                )}
 
                 {/* Game error overlay */}
                 {gameError && (
