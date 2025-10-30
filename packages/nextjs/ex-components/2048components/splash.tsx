@@ -3,7 +3,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { GameContext } from "~~/context/game-context";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
-import { useSeamlessTransactions } from "~~/hooks/useSeamlessTransactions";
+import { useSeamlessTransactions } from "~~/hooks/useTransactions";
 import styles from "~~/styles/2048styles/splash.module.css";
 
 export default function GameWonButton({ heading = "You have reached 2048!", type = "WON" }) {

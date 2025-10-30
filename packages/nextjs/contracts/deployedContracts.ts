@@ -5,1220 +5,23 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
-  31337: {
-    Play2048Wars: {
-      address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
-      abi: [
-        {
-          type: "constructor",
-          inputs: [
-            {
-              name: "_entryFee",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "_owner",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "receive",
-          stateMutability: "payable",
-        },
-        {
-          type: "function",
-          name: "checkpoint",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "boardArray",
-              type: "uint8[16]",
-              internalType: "uint8[16]",
-            },
-            {
-              name: "moves",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "currentRound",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "enterGame",
-          inputs: [],
-          outputs: [],
-          stateMutability: "payable",
-        },
-        {
-          type: "function",
-          name: "entryFee",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "gameLost",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "gameWon",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "movesPlayed",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "getAllWinners",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "address[]",
-              internalType: "address[]",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getCurrentRoundPool",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getEntryFee",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getGameStats",
-          inputs: [],
-          outputs: [
-            {
-              name: "totalGames",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "nextId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getNextRoundPool",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getPlayerCheckpoint",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "boardHash",
-              type: "bytes32",
-              internalType: "bytes32",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "moves",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "timestamp",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getPlayerGameId",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getTimeRemainingOfCurrentRound",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "hasCheckpoint",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "isPlayer",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "isWinner",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "nextGameId",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "nextRoundStart",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "owner",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointBoardHash",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bytes32",
-              internalType: "bytes32",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointGameId",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointMoves",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint8",
-              internalType: "uint8",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointScore",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointTime",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerFinalMoves",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerFinalScore",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerGameId",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playersList",
-          inputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "renounceOwnership",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "setNewEntryFee",
-          inputs: [
-            {
-              name: "_entryFee",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "totalGamesPlayed",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "transferOwnership",
-          inputs: [
-            {
-              name: "newOwner",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "verifyCheckpointBoard",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "boardArray",
-              type: "uint8[16]",
-              internalType: "uint8[16]",
-            },
-          ],
-          outputs: [
-            {
-              name: "isValid",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "winnersList",
-          inputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "event",
-          name: "CheckpointSaved",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-            {
-              name: "board",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-            {
-              name: "moves",
-              type: "uint8",
-              indexed: false,
-              internalType: "uint8",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "GameCompleted",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-            {
-              name: "finalScore",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "GameEntered",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "GameOver",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "GameStarted",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "NewRoundStarted",
-          inputs: [],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "NoWinnersInRound",
-          inputs: [
-            {
-              name: "round",
-              type: "uint256",
-              indexed: true,
-              internalType: "uint256",
-            },
-            {
-              name: "poolAmount",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "OwnershipTransferred",
-          inputs: [
-            {
-              name: "previousOwner",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "newOwner",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "PlayerAssigned",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "WinnerAssigned",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "error",
-          name: "OwnableInvalidOwner",
-          inputs: [
-            {
-              name: "owner",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-        },
-        {
-          type: "error",
-          name: "OwnableUnauthorizedAccount",
-          inputs: [
-            {
-              name: "account",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-        },
-        {
-          type: "error",
-          name: "ReentrancyGuardReentrantCall",
-          inputs: [],
-        },
-      ],
-      inheritedFunctions: {},
-      deployedOnBlock: 1,
-    },
-  },
   84532: {
-    Play2048Wars: {
-      address: "0xa65937a3e7fcda3d7d1debc2ffa9d1bba9fd9ab0",
+    Monad2048: {
+      address: "0xd7141856eb36936259a59038e98b8855d32e582f",
       abi: [
         {
-          type: "constructor",
+          type: "function",
+          name: "gameHashOf",
           inputs: [
             {
-              name: "_entryFee",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "_owner",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "receive",
-          stateMutability: "payable",
-        },
-        {
-          type: "function",
-          name: "checkpoint",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "boardArray",
-              type: "uint8[16]",
-              internalType: "uint8[16]",
-            },
-            {
-              name: "moves",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "currentRound",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "enterGame",
-          inputs: [],
-          outputs: [],
-          stateMutability: "payable",
-        },
-        {
-          type: "function",
-          name: "entryFee",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "gameLost",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "gameWon",
-          inputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "movesPlayed",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "getAllWinners",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "address[]",
-              internalType: "address[]",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getCurrentRoundPool",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getEntryFee",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getGameStats",
-          inputs: [],
-          outputs: [
-            {
-              name: "totalGames",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "nextId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getNextRoundPool",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getPlayerCheckpoint",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "gameId",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "boardHash",
+              name: "gameHash",
               type: "bytes32",
               internalType: "bytes32",
             },
-            {
-              name: "score",
-              type: "uint256",
-              internalType: "uint256",
-            },
-            {
-              name: "moves",
-              type: "uint8",
-              internalType: "uint8",
-            },
-            {
-              name: "timestamp",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getPlayerGameId",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
           ],
           outputs: [
             {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "getTimeRemainingOfCurrentRound",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "hasCheckpoint",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "isPlayer",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "isWinner",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "nextGameId",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "nextRoundStart",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "owner",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointBoardHash",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
+              name: "gameId",
               type: "bytes32",
               internalType: "bytes32",
             },
@@ -1227,248 +30,144 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "playerCheckpointGameId",
+          name: "getBoard",
           inputs: [
             {
-              name: "",
-              type: "address",
-              internalType: "address",
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
             },
           ],
           outputs: [
             {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointMoves",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint8",
-              internalType: "uint8",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointScore",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerCheckpointTime",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerFinalMoves",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerFinalScore",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playerGameId",
-          inputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "playersList",
-          inputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "renounceOwnership",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "setNewEntryFee",
-          inputs: [
-            {
-              name: "_entryFee",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "totalGamesPlayed",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "transferOwnership",
-          inputs: [
-            {
-              name: "newOwner",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "verifyCheckpointBoard",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "boardArray",
+              name: "boardArr",
               type: "uint8[16]",
               internalType: "uint8[16]",
             },
-          ],
-          outputs: [
             {
-              name: "isValid",
-              type: "bool",
-              internalType: "bool",
+              name: "nextMoveNumber",
+              type: "uint256",
+              internalType: "uint256",
             },
           ],
           stateMutability: "view",
         },
         {
           type: "function",
-          name: "winnersList",
+          name: "latestBoard",
           inputs: [
             {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
             },
           ],
           outputs: [
             {
               name: "",
-              type: "address",
-              internalType: "address",
+              type: "uint128",
+              internalType: "uint128",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "nextMove",
+          inputs: [
+            {
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint120",
+              internalType: "uint120",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "play",
+          inputs: [
+            {
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+            {
+              name: "move",
+              type: "uint8",
+              internalType: "uint8",
+            },
+            {
+              name: "resultBoard",
+              type: "uint128",
+              internalType: "uint128",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "startGame",
+          inputs: [
+            {
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+            {
+              name: "boards",
+              type: "uint128[4]",
+              internalType: "uint128[4]",
+            },
+            {
+              name: "moves",
+              type: "uint8[3]",
+              internalType: "uint8[3]",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "state",
+          inputs: [
+            {
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          outputs: [
+            {
+              name: "move",
+              type: "uint8",
+              internalType: "uint8",
+            },
+            {
+              name: "nextMove",
+              type: "uint120",
+              internalType: "uint120",
+            },
+            {
+              name: "board",
+              type: "uint128",
+              internalType: "uint128",
             },
           ],
           stateMutability: "view",
         },
         {
           type: "event",
-          name: "CheckpointSaved",
+          name: "NewGame",
           inputs: [
             {
               name: "player",
@@ -1477,10 +176,10 @@ const deployedContracts = {
               internalType: "address",
             },
             {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
+              name: "id",
+              type: "bytes32",
+              indexed: true,
+              internalType: "bytes32",
             },
             {
               name: "board",
@@ -1488,24 +187,12 @@ const deployedContracts = {
               indexed: false,
               internalType: "uint256",
             },
-            {
-              name: "moves",
-              type: "uint8",
-              indexed: false,
-              internalType: "uint8",
-            },
-            {
-              name: "score",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
           ],
           anonymous: false,
         },
         {
           type: "event",
-          name: "GameCompleted",
+          name: "NewMove",
           inputs: [
             {
               name: "player",
@@ -1514,45 +201,19 @@ const deployedContracts = {
               internalType: "address",
             },
             {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-            {
-              name: "finalScore",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "GameEntered",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
+              name: "id",
+              type: "bytes32",
               indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "GameOver",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
+              internalType: "bytes32",
             },
             {
-              name: "gameId",
+              name: "move",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "result",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
@@ -1561,124 +222,28 @@ const deployedContracts = {
           anonymous: false,
         },
         {
-          type: "event",
-          name: "GameStarted",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "gameId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "NewRoundStarted",
+          type: "error",
+          name: "GameBoardInvalid",
           inputs: [],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "NoWinnersInRound",
-          inputs: [
-            {
-              name: "round",
-              type: "uint256",
-              indexed: true,
-              internalType: "uint256",
-            },
-            {
-              name: "poolAmount",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "OwnershipTransferred",
-          inputs: [
-            {
-              name: "previousOwner",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-            {
-              name: "newOwner",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "PlayerAssigned",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
-        },
-        {
-          type: "event",
-          name: "WinnerAssigned",
-          inputs: [
-            {
-              name: "player",
-              type: "address",
-              indexed: true,
-              internalType: "address",
-            },
-          ],
-          anonymous: false,
         },
         {
           type: "error",
-          name: "OwnableInvalidOwner",
-          inputs: [
-            {
-              name: "owner",
-              type: "address",
-              internalType: "address",
-            },
-          ],
+          name: "GameIdUsed",
+          inputs: [],
         },
         {
           type: "error",
-          name: "OwnableUnauthorizedAccount",
-          inputs: [
-            {
-              name: "account",
-              type: "address",
-              internalType: "address",
-            },
-          ],
+          name: "GamePlayed",
+          inputs: [],
         },
         {
           type: "error",
-          name: "ReentrancyGuardReentrantCall",
+          name: "GamePlayerInvalid",
           inputs: [],
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 32746904,
+      deployedOnBlock: 32989497,
     },
   },
 } as const;

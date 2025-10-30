@@ -21,6 +21,11 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
+    label: "Play 2048",
+    href: "/play2048",
+    // icon: <Gamepad2Icon className="h-4 w-4" />,
+  },
+  {
     label: "Leaderboard",
     href: "/leaderboard",
     icon: <TrophyIcon className="h-4 w-4" />,

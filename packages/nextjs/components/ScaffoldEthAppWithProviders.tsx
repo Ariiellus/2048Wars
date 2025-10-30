@@ -49,6 +49,8 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
       const msg = args[0]?.toString() || "";
       if (
         msg.includes("clip-path") ||
+        msg.includes("clipPath") ||
+        msg.includes("Invalid DOM property") ||
         msg.includes("cannot be a descendant of") ||
         msg.includes("cannot contain a nested") ||
         msg.includes("React does not recognize") ||

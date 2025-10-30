@@ -23,7 +23,9 @@ type Action =
   | { type: "MOVE_LEFT" }
   | { type: "MOVE_RIGHT" }
   | { type: "RESET_GAME" }
-  | { type: "UPDATE_STATUS"; status: GameStatus };
+  | { type: "UPDATE_STATUS"; status: GameStatus }
+  | { type: "ROLLBACK_STATE"; state: State }
+  | { type: "SET_SCORE_AND_MOVES"; score: number; moves: number };
 
 function createBoard() {
   const board: string[][] = [];
@@ -307,6 +309,16 @@ export default function gameReducer(state: State = initialState, action: Action)
       return {
         ...state,
         status: action.status,
+      };
+    case "ROLLBACK_STATE":
+      // Restore a previous game state (for transaction rollback)
+      return action.state;
+    case "SET_SCORE_AND_MOVES":
+      // Set score and moves directly (for recovery)
+      return {
+        ...state,
+        score: action.score,
+        moves: action.moves,
       };
     default:
       return state;
