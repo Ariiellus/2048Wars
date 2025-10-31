@@ -1,35 +1,28 @@
 .score, .moves {
-  background: var(--cell-background);
-  border: none;
-  border-radius: calc(var(--pixel-size) * 1);
-  color: var(--secondary-text-color);
+  background: var(--secondary-background);
+  border: calc(var(--pixel-size) * 0.5) solid var(--secondary-background);
+  border-radius: calc(var(--pixel-size) * 0.75);
+  color: var(--primary-text-color);
   font-size: calc(var(--pixel-size) * 1.5);
   line-height: calc(var(--pixel-size) * 3);
   font-weight: bold;
   text-align: center;
   text-transform: uppercase;
-  min-width: calc(var(--pixel-size) * 15);
-  padding: calc(var(--pixel-size) * 1) calc(var(--pixel-size) * 1.5);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .score > div, .moves > div {
-  font-size: calc(var(--pixel-size) * 3);
-  color: var(--secondary-text-color);
-  font-weight: 900;
-  letter-spacing: 0.5px;
+  font-size: calc(var(--pixel-size) * 2.5);
+  color: var(--score-text-color);
 }
 
 @media (min-width: 512px) {
   .score, .moves {
+    border: calc(var(--pixel-size) * 1) solid var(--secondary-background);
     font-size: calc(var(--pixel-size) * 2);
     line-height: calc(var(--pixel-size) * 3.5);
-    min-width: calc(var(--pixel-size) * 20);
-    padding: calc(var(--pixel-size) * 1.25) calc(var(--pixel-size) * 2);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   }
 
   .score > div, .moves > div {
-    font-size: calc(var(--pixel-size) * 4);
+    font-size: calc(var(--pixel-size) * 3.5);
   }
 }

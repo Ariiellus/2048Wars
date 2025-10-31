@@ -39,13 +39,13 @@ const Leaderboard: NextPage = () => {
               address: contractInfo.address,
               abi: contractInfo.abi,
               functionName: "playerFinalScore",
-              args: [winner],
+              args: [winner as `0x${string}`],
             }),
             publicClient.readContract({
               address: contractInfo.address,
               abi: contractInfo.abi,
               functionName: "playerFinalMoves",
-              args: [winner],
+              args: [winner as `0x${string}`],
             }),
           ]);
 
@@ -103,7 +103,7 @@ const Leaderboard: NextPage = () => {
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <Address address={entry.player} />
+                          <Address address={entry.player as `0x${string}`} />
                           {entry.player.toLowerCase() === connectedAddress?.toLowerCase() && (
                             <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                               You

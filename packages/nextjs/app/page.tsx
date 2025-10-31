@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-// import Moves from "../components/2048components/moves";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import Play2048 from "~~/components/Play2048";
-// import CurrentPool from "~~/components/2048components/currentPool";
-// import NextPool from "~~/components/2048components/nextPool";
-// import Score from "~~/components/2048components/score";
+import CurrentPool from "~~/components/currentPool";
+import NextPool from "~~/components/nextPool";
 import EnterGameButton from "~~/components/enterGameButton";
 import { PrivyConnectButton } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
@@ -67,17 +65,13 @@ const Home: NextPage = () => {
             )}
             {hasActiveGame && !isGameLoading && (
               <>
-                <div className="grid grid-cols-2 gap-4">
-                  {/* <Moves /> */}
-                  {/* <Score /> */}
-                </div>
                 <div className="flex justify-center mt-4">
                   <Play2048 />
                 </div>
                 <div className="mt-4">
                   <div className="grid grid-cols-2 gap-4">
-                    {/* <CurrentPool /> */}
-                    {/* <NextPool /> */}
+                    <CurrentPool />
+                    <NextPool />
                   </div>
                 </div>
               </>
