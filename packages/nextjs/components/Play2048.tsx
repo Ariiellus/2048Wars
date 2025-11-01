@@ -753,10 +753,8 @@ export default function Game2048() {
                     <Board
                         containerRef={gameContainerRef}
                         tiles={boardState.tiles}
-                        score={boardState.score}
                         gameOver={gameOver}
                         gameError={gameError}
-                        gameErrorText={gameErrorText}
                         resyncGame={resyncGame}
                         initializeGame={initializeGame}
                     />

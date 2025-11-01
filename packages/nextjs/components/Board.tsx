@@ -1,5 +1,5 @@
-import FunPurpleButton from "./FunPurpleButton";
 import tileStyles from "~~/styles/2048styles/tile.module.css";
+import Countdown from "./Countdown";
 
 type Tile = {
   id: string;
@@ -12,11 +12,9 @@ type Tile = {
 
 type BoardProps = {
   containerRef: any;
-  score: number;
   tiles: Tile[];
   gameOver: boolean;
   gameError: boolean;
-  gameErrorText: string;
   resyncGame: () => void;
   initializeGame: () => void;
 };
@@ -24,12 +22,9 @@ type BoardProps = {
 export default function Board({
   containerRef,
   tiles,
-  score,
   gameOver,
   gameError,
-  gameErrorText,
   resyncGame,
-  initializeGame,
 }: BoardProps) {
   // Get the background color for a tile based on its value
   const getTileColor = (value: number) => {
@@ -72,7 +67,7 @@ export default function Board({
     <>
       <div
         ref={containerRef}
-        className="rounded-lg p-2 w-full max-w-md aspect-square grid grid-cols-4 grid-rows-4 gap-2"
+        className="relative rounded-lg p-2 w-full max-w-md aspect-square grid grid-cols-4 grid-rows-4 gap-2"
         style={{ backgroundColor: "var(--secondary-background)" }}
       >
         {/* Create 16 cells for the grid */}
@@ -94,12 +89,10 @@ export default function Board({
                     className={`absolute inset-0 rounded-md flex items-center justify-center ${getTileColor(tile.value)}`}
                     style={{
                       transition: "all 150ms ease-in-out",
-                      transform: tile.mergedFrom ? "scale(1.1)" : tile.isNew ? "scale(0.5)" : "scale(1)",
-                      animation: tile.mergedFrom
-                        ? "merge 200ms ease-in-out"
-                        : tile.isNew
-                          ? "appear 200ms ease-in-out forwards"
-                          : "none",
+                      transform: tile.isNew ? "scale(0.5)" : "scale(1)",
+                      animation: tile.mergedFrom ? "merge 200ms ease-in-out" : tile.isNew
+                        ? "appear 200ms ease-in-out forwards"
+                        : "none",
                     }}
                   >
                     <span className={`font-bold ${getTileFontSize(tile.value)}`}>{tile.value}</span>
@@ -110,18 +103,7 @@ export default function Board({
           })}
 
         {/* Game error overlay */}
-        {gameError && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-lg z-20">
-            <div className="p-6 bg-white rounded-lg text-center">
-              <h2 className="text-2xl font-bold mb-4">Oops! Game Error :(</h2>
-              <p className="mb-2 text-red-500">
-                <span className="text-red-600 font-bold">Error</span>: {gameErrorText}
-              </p>
-              <p className="mb-4">Your score: {score}</p>
-              <FunPurpleButton text="Re-sync game" onClick={resyncGame} />
-            </div>
-          </div>
-        )}
+        <Countdown gameError={gameError} resyncGame={resyncGame} />
       </div>
 
       <style>{`
@@ -139,5 +121,3 @@ export default function Board({
     </>
   );
 }
-
-///

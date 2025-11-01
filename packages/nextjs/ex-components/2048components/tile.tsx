@@ -22,7 +22,7 @@ export default function Tile({ position, value }: TileProps) {
 
   useEffect(() => {
     if (hasChanged) {
-      setScale(1.1);
+      setScale(1);
       setTimeout(() => setScale(1), mergeAnimationDuration);
     }
   }, [hasChanged]);

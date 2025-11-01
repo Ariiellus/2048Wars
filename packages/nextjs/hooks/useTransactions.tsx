@@ -1,10 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Button } from "../components/ui/button";
 import { publicClient } from "../utils/client";
 import { GAME_CONTRACT_ADDRESS } from "../utils/constants";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { ExternalLink } from "lucide-react";
-import { toast } from "sonner";
 import { Hex, createWalletClient, custom, encodeFunctionData, formatEther } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { baseSepolia } from "viem/chains";
@@ -146,14 +143,10 @@ export function useTransactions() {
       });
 
       if (receipt.status == "reverted") {
-        throw Error(`Failed to confirm transaction: ${transactionHash}`);
+        throw new Error(`Transaction reverted: ${transactionHash}`);
       }
     } catch (error) {
       e = error as Error;
-
-      toast.error(`Failed to send transaction.`, {
-        description: `Error: ${e.message}`,
-      });
     }
 
     if (e) {
