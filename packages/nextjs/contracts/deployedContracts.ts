@@ -31,19 +31,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "currentRound",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "enterGame",
           inputs: [],
           outputs: [],
@@ -427,6 +414,19 @@ const deployedContracts = {
           inputs: [],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "roundNumber",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -831,7 +831,7 @@ const deployedContracts = {
   },
   84532: {
     Play2048Wars: {
-      address: "0x6f056c9aff7e6837f04a031062f7ef4b86d5b8ec",
+      address: "0x839da11adcdc6a647ae7c9ef23eb89eb02a01597",
       abi: [
         {
           type: "constructor",
@@ -852,19 +852,6 @@ const deployedContracts = {
         {
           type: "receive",
           stateMutability: "payable",
-        },
-        {
-          type: "function",
-          name: "currentRound",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
         },
         {
           type: "function",
@@ -1251,6 +1238,19 @@ const deployedContracts = {
           inputs: [],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "roundNumber",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -1650,7 +1650,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 33034260,
+      deployedOnBlock: 33126189,
     },
   },
 } as const;

@@ -142,7 +142,50 @@ contract Play2048Wars is Manager2048Wars {
     // Update board.
     state[gameId] = GameState({ move: move, nextMove: latestState.nextMove + 1, board: resultBoard });
 
-    emit NewMove(msg.sender, gameId, move, resultBoard);
+    // Check if game is won or lost
+    if (hasTileReached2048(resultBoard)) {
+      gameWon(uint256(gameId), uint256(resultBoard), latestState.nextMove + 1, msg.sender);
+    } else {
+      gameLost(uint256(gameId), msg.sender);
+    }
+  }
+
+  // =============================================================//
+  //                           INTERNAL                           //
+  // =============================================================//
+
+  function hasTileReached2048(uint128 board) internal pure returns (bool) {
+    // log₂(2048) = 11, so we check if any tile has log₂ value >= 11
+    // Check all 16 tile positions
+    for (uint8 i = 0; i < 16; i++) {
+      uint8 tileLogValue = Board.getTile(board, i);
+      if (tileLogValue >= 6) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function gameWon(uint256 gameId, uint256 score, uint256 movesPlayed, address player) internal {
+    require(playerGameId[player] == gameId, "Invalid game");
+
+    playerFinalMoves[player] = movesPlayed;
+    playerFinalScore[player] = score;
+
+    emit GameCompleted(player, gameId, score);
+
+    assignWinner(player);
+    isPlayer[player] = false;
+  }
+
+  function gameLost(uint256 gameId, address player) internal {
+    require(playerGameId[player] == gameId, "Invalid game");
+
+    isPlayer[player] = false;
+    emit GameOver(player, gameId);
+    
+    // Reset gameId so player can start a new game
+    playerGameId[player] = 0;
   }
 
   // =============================================================//

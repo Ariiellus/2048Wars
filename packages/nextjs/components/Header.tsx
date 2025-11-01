@@ -17,12 +17,12 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Home",
+    label: "Play",
     href: "/",
   },
   {
-    label: "Play 2048",
-    href: "/play2048",
+    label: "How to Play",
+    href: "/howtoplay",
     // icon: <Gamepad2Icon className="h-4 w-4" />,
   },
   {

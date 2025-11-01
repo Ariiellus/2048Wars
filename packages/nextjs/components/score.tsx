@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef} from "react";
 import styles from "~~/styles/2048styles/counter.module.css";
 
@@ -44,7 +45,9 @@ export default function Score({ score }: ScoreProps) {
     return (
       <div className={styles.score}>
         Score
-        <div>{displayScore}</div>
+        <div>{displayScore}
+
+        </div>
       </div>
     );
 }
