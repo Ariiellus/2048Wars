@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useTransactions } from "~~/hooks/useTransactions";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 
 // UI
 import Board from "~~/components/Board";
@@ -370,12 +371,19 @@ export default function Game2048() {
         setAddress((privyUser as any).address);
     }, [user]);
 
+    // Fetch the player's gameId from the contract
+    const { data: contractGameId } = useScaffoldReadContract({
+        contractName: "Play2048Wars",
+        functionName: "getPlayerGameId",
+        args: [address as `0x${string}`],
+    });
+
     // Auto-initialize game when address is available and board is empty
     useEffect(() => {
-        if (address && boardState.tiles.length === 0 && !gameOver && !gameError && !isAnimating) {
+        if (address && contractGameId && boardState.tiles.length === 0 && !gameOver && !gameError && !isAnimating) {
             initializeGame();
         }
-    }, [address, boardState.tiles.length, gameOver, gameError, isAnimating]);
+    }, [address, contractGameId, boardState.tiles.length, gameOver, gameError, isAnimating]);
 
     // Initialize the game with two random tiles
     const initializeGame = () => {

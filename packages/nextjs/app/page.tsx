@@ -20,8 +20,8 @@ const Home: NextPage = () => {
     args: [connectedAddress as `0x${string}`] as const,
   });
 
-  // Check if player has an active game (playerGameId > 0)
-  const hasActiveGame = playerGameId && BigInt(playerGameId) > 0n;
+  // Check if player has an active game (playerGameId != 0x0...0)
+  const hasActiveGame = playerGameId && playerGameId !== "0x0000000000000000000000000000000000000000000000000000000000000000";
 
   const handleGameEntered = async () => {
     setIsGameLoading(true);

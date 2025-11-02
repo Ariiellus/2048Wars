@@ -67,6 +67,17 @@ library Board {
         return processMove(prevBoard, move, seed) == nextBoard;
     }
 
+    function hasValidMovesRemaining(uint128 board) public pure returns (bool) {
+        for (uint8 move = 0; move < 4; move++) {
+            uint128 result = processMove(board, move <= DOWN, move % 2 == 0);
+            if (result != board) {
+                return true;
+            }
+        }
+        // No valid moves found
+        return false;
+    }
+
     // =============================================================//
     //                        TRANSFORMATIONS                       //
     // =============================================================//

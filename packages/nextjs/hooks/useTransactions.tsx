@@ -323,7 +323,7 @@ export function useTransactions() {
     await sendRawTransactionAndConfirm({
       nonce,
       successText: `Played move ${moveCount}`,
-      gas: BigInt(100_000),
+      gas: BigInt(300_000), // Increased for hasValidMovesRemaining check
       data: encodeFunctionData({
         abi: [
           {

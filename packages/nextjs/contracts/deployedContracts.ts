@@ -141,11 +141,6 @@ const deployedContracts = {
               type: "uint256",
               internalType: "uint256",
             },
-            {
-              name: "nextId",
-              type: "uint256",
-              internalType: "uint256",
-            },
           ],
           stateMutability: "view",
         },
@@ -175,8 +170,8 @@ const deployedContracts = {
           outputs: [
             {
               name: "",
-              type: "uint256",
-              internalType: "uint256",
+              type: "bytes32",
+              internalType: "bytes32",
             },
           ],
           stateMutability: "view",
@@ -247,19 +242,6 @@ const deployedContracts = {
               name: "",
               type: "uint128",
               internalType: "uint128",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "nextGameId",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -373,6 +355,25 @@ const deployedContracts = {
         {
           type: "function",
           name: "playerGameId",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerGameNonce",
           inputs: [
             {
               name: "",
@@ -831,7 +832,7 @@ const deployedContracts = {
   },
   84532: {
     Play2048Wars: {
-      address: "0x839da11adcdc6a647ae7c9ef23eb89eb02a01597",
+      address: "0xd61ee0bda105a829f0bc45b55984a12fd0944087",
       abi: [
         {
           type: "constructor",
@@ -965,11 +966,6 @@ const deployedContracts = {
               type: "uint256",
               internalType: "uint256",
             },
-            {
-              name: "nextId",
-              type: "uint256",
-              internalType: "uint256",
-            },
           ],
           stateMutability: "view",
         },
@@ -999,8 +995,8 @@ const deployedContracts = {
           outputs: [
             {
               name: "",
-              type: "uint256",
-              internalType: "uint256",
+              type: "bytes32",
+              internalType: "bytes32",
             },
           ],
           stateMutability: "view",
@@ -1071,19 +1067,6 @@ const deployedContracts = {
               name: "",
               type: "uint128",
               internalType: "uint128",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "nextGameId",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -1197,6 +1180,25 @@ const deployedContracts = {
         {
           type: "function",
           name: "playerGameId",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "playerGameNonce",
           inputs: [
             {
               name: "",
@@ -1650,7 +1652,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 33126189,
+      deployedOnBlock: 33137720,
     },
   },
 } as const;

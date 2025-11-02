@@ -52,8 +52,8 @@ contract Play2048Wars is Manager2048Wars {
   mapping(bytes32 gameHash => bytes32 gameId) public gameHashOf;
 
   // Game state mappings
-  mapping(address => uint256) public playerGameId; // Active game ID per player
-  uint256 public nextGameId; // Next available game ID
+  mapping(address => bytes32) public playerGameId; // Active game ID per player
+  mapping(address => uint256) public playerGameNonce; // Game nonce per player for unique IDs
   uint256 public totalGamesPlayed; // Total games played
 
   // Final results mappings
@@ -70,7 +70,6 @@ contract Play2048Wars is Manager2048Wars {
   }
 
   constructor(uint256 _entryFee, address _owner) Manager2048Wars(_entryFee, _owner) {
-    nextGameId = 1;
     totalGamesPlayed = 0;
   }
 
@@ -138,16 +137,18 @@ contract Play2048Wars is Manager2048Wars {
       ),
       GameBoardInvalid()
     );
+    emit NewMove(msg.sender, gameId, move, resultBoard);
 
     // Update board.
     state[gameId] = GameState({ move: move, nextMove: latestState.nextMove + 1, board: resultBoard });
 
-    // Check if game is won or lost
-    if (hasTileReached2048(resultBoard)) {
-      gameWon(uint256(gameId), uint256(resultBoard), latestState.nextMove + 1, msg.sender);
-    } else {
-      gameLost(uint256(gameId), msg.sender);
-    }
+    if (!Board.hasValidMovesRemaining(resultBoard)) {
+      if (hasTileReached2048(resultBoard)) {
+        gameWon(uint256(gameId), uint256(resultBoard), latestState.nextMove + 1, msg.sender);
+      } else {
+        gameLost(uint256(gameId), msg.sender);
+      }
+    } 
   }
 
   // =============================================================//
@@ -159,7 +160,7 @@ contract Play2048Wars is Manager2048Wars {
     // Check all 16 tile positions
     for (uint8 i = 0; i < 16; i++) {
       uint8 tileLogValue = Board.getTile(board, i);
-      if (tileLogValue >= 6) {
+      if (tileLogValue >= 11) {
         return true;
       }
     }
@@ -167,25 +168,25 @@ contract Play2048Wars is Manager2048Wars {
   }
 
   function gameWon(uint256 gameId, uint256 score, uint256 movesPlayed, address player) internal {
-    require(playerGameId[player] == gameId, "Invalid game");
 
     playerFinalMoves[player] = movesPlayed;
     playerFinalScore[player] = score;
 
-    emit GameCompleted(player, gameId, score);
-
     assignWinner(player);
     isPlayer[player] = false;
+
+    emit GameCompleted(player, gameId, score);
+
+    // Reset gameId so player can start a new game
+    playerGameId[player] = bytes32(0);
   }
 
   function gameLost(uint256 gameId, address player) internal {
-    require(playerGameId[player] == gameId, "Invalid game");
-
     isPlayer[player] = false;
     emit GameOver(player, gameId);
-    
+
     // Reset gameId so player can start a new game
-    playerGameId[player] = 0;
+    playerGameId[player] = bytes32(0);
   }
 
   // =============================================================//
@@ -194,28 +195,30 @@ contract Play2048Wars is Manager2048Wars {
 
   function enterGame() public payable override {
     // Check if player already has an active game
-    require(playerGameId[msg.sender] == 0, "You already have an active game");
+    require(playerGameId[msg.sender] == bytes32(0), "You already have an active game");
 
     // Call parent enterGame to handle round management and player registration
     super.enterGame();
 
-    // Assign a unique gameId to the player
-    playerGameId[msg.sender] = nextGameId++;
+    uint256 nonce = playerGameNonce[msg.sender]++;
+    bytes32 gameId = bytes32((uint256(uint160(msg.sender)) << 96) | nonce);
+
+    playerGameId[msg.sender] = gameId;
     totalGamesPlayed++;
 
-    emit GameStarted(msg.sender, playerGameId[msg.sender]);
+    emit GameStarted(msg.sender, uint256(gameId));
   }
 
   // =============================================================//
   //                           GETTERS                            //
   // =============================================================//
 
-  function getPlayerGameId(address player) public view returns (uint256) {
+  function getPlayerGameId(address player) public view returns (bytes32) {
     return playerGameId[player];
   }
 
-  function getGameStats() public view returns (uint256 totalGames, uint256 nextId) {
-    return (totalGamesPlayed, nextGameId);
+  function getGameStats() public view returns (uint256 totalGames) {
+    return totalGamesPlayed;
   }
 
   // =============================================================//
