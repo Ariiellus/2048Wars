@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { sdk } from "@farcaster/miniapp-sdk";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,7 +39,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
-  const [isInFarcaster, setIsInFarcaster] = useState(false);
+  const [isInFarcaster] = useState(false);
 
   useEffect(() => {
     setMounted(true);
