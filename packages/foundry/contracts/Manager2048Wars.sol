@@ -31,7 +31,7 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
     require(_owner != address(0), "Owner cannot be zero address");
     require(_entryFee > 0, "Entry fee must be greater than 0");
     entryFee = _entryFee; // 0.001 ether per game
-    nextRoundStart = block.timestamp + 15 minutes; // each round lasts 15 minutes
+    nextRoundStart = block.timestamp + 1 weeks;
     roundNumber = 1;
   }
 
@@ -60,7 +60,7 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
       // Pool automatically rolls to next round (no action needed)
     }
 
-    nextRoundStart = block.timestamp + 15 minutes; // Fixed: should be 1 week, not 1 hour
+    nextRoundStart = block.timestamp + 1 weeks;
     roundNumber++;
     emit NewRoundStarted();
   }
@@ -152,12 +152,10 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
   }
 
   function getNextRoundPool() public view returns (uint256) {
-    return address(this).balance / 2; // In the future add creator fee
+    return address(this).balance / 2;
   }
 
   function getAllWinners() public view returns (address[] memory) {
     return winnersList;
   }
-
-  receive() external payable {}
 }

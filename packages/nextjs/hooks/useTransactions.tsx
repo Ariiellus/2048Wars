@@ -4,7 +4,7 @@ import { GAME_CONTRACT_ADDRESS } from "../utils/constants";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, formatEther } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
-import { baseSepolia } from "viem/chains";
+import { base } from "viem/chains";
 
 export function useTransactions() {
   // User and Wallet objects.
@@ -55,7 +55,7 @@ export function useTransactions() {
 
       const ethereumProvider = await userWallet.getEthereumProvider();
       const provider = createWalletClient({
-        chain: baseSepolia,
+        chain: base,
         transport: custom(ethereumProvider),
       });
 
@@ -96,10 +96,10 @@ export function useTransactions() {
 
       const startTime = Date.now();
 
-      // Fetch current gas prices from the network for Base Sepolia (much cheaper than defaults)
+      // Fetch current gas prices from the network for Base mainnet
       const gasPrice = await publicClient.getGasPrice();
 
-      // Base Sepolia is very cheap - use 1.2x multiplier for fast confirmation
+      // Use 1.2x multiplier for fast confirmation
       const optimizedMaxFeePerGas = maxFeePerGas ?? (gasPrice * BigInt(120)) / BigInt(100);
       const optimizedMaxPriorityFeePerGas = maxPriorityFeePerGas ?? gasPrice / BigInt(10); // 10% of base fee
 
@@ -123,7 +123,7 @@ export function useTransactions() {
         gas,
         maxFeePerGas: optimizedMaxFeePerGas,
         maxPriorityFeePerGas: optimizedMaxPriorityFeePerGas,
-        chain: baseSepolia,
+        chain: base,
         type: "eip1559",
       });
 

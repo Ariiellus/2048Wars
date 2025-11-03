@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useWallets } from "@privy-io/react-auth";
 import { formatEther, parseEther } from "viem";
-import { useAccount, useBalance } from "wagmi";
+import { base } from "viem/chains";
+import { useBalance } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 
@@ -12,10 +14,17 @@ interface EnterGameButtonProps {
 
 export default function EnterGameButton({ heading = "Can you make it to 2048?", onGameEntered }: EnterGameButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { address } = useAccount();
+  const { wallets } = useWallets();
+
+  // Prioritize embedded wallet for seamless transactions
+  const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
+  const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
+  const activeWallet = embeddedWallet || externalWallet;
+  const address = activeWallet?.address as `0x${string}` | undefined;
 
   const { data: balance } = useBalance({
     address: address,
+    chainId: base.id,
   });
 
   const { data: entryFee } = useScaffoldReadContract({
@@ -27,8 +36,8 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
     contractName: "Play2048Wars",
   });
 
-  // Check if user has enough ETH for entry fee + gas (0.0015 ETH total)
-  const requiredAmount = parseEther("0.0015");
+  // Check if user has enough ETH for entry fee + gas (0.0012 ETH total)
+  const requiredAmount = parseEther("0.0012");
   const hasInsufficientFunds = balance && BigInt(balance.value) < requiredAmount;
 
   const handleEnterGame = async () => {
@@ -59,7 +68,7 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
           <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">
             <p className="font-bold text-sm text-red-800 mb-1">Insufficient funds!</p>
             <p className="text-sm text-red-700">
-              You need at least 0.0015 ETH to enter the game (0.001 ETH entry fee + 0.0005 ETH gas).
+              You need at least 0.0012 ETH to enter the game (0.001 ETH entry fee + 0.0002 ETH gas).
             </p>
             <p className="text-xs text-red-600 mt-1">
               Current balance: {balance ? formatEther(BigInt(balance.value)) : "0"} ETH

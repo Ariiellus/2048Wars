@@ -244,7 +244,7 @@ library Board {
     function hasTileReached2048(uint128 board) public pure returns (bool) {
         for (uint8 i = 0; i < 16; i++) {
             uint8 tileLogValue = getTile(board, i);
-            if (tileLogValue >= 6) {
+            if (tileLogValue >= 11) {
                 return true;
             }
         }

@@ -3,6 +3,7 @@ pragma solidity ^0.8.28;
 
 import { Board } from "./LibBoard.sol";
 import { Manager2048Wars } from "./Manager2048Wars.sol";
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 
 struct GameState {
   uint8 move;
@@ -16,7 +17,7 @@ struct GameState {
  * @author Ariiellus
  * @notice The foundation of this contract is the Monad2048 contract. More info: https://blog.monad.xyz
  */
-contract Play2048Wars is Manager2048Wars {
+contract Play2048Wars is Manager2048Wars, Pausable {
   // =============================================================//
   //                            ERRORS                            //
   // =============================================================//
@@ -43,6 +44,9 @@ contract Play2048Wars is Manager2048Wars {
   event GameOver(address indexed player, uint256 gameId);
   event CheckpointSaved(address indexed player, uint256 gameId, uint256 board, uint8 moves, uint256 score);
 
+  event MigrationInitiated(address indexed newContract, uint256 deadline);
+  event FundsTransferred(address indexed newContract, uint256 amount);
+
   // =============================================================//
   //                           STORAGE                            //
   // =============================================================//
@@ -61,6 +65,10 @@ contract Play2048Wars is Manager2048Wars {
   mapping(address => uint256) public playerFinalScore; // Final score for last completed game per player
   mapping(address => uint256) public playerFinalMoves; // Final moves played for last completed game per player
 
+  address public migrationContract;
+  bool public migrationMode;
+  uint256 public migrationCountdown;
+
   // =============================================================//
   //                          MODIFIERS                           //
   // =============================================================//
@@ -72,6 +80,45 @@ contract Play2048Wars is Manager2048Wars {
 
   constructor(uint256 _entryFee, address _owner) Manager2048Wars(_entryFee, _owner) {
     totalGamesPlayed = 0;
+    migrationMode = false;
+  }
+
+  // =============================================================//
+  //                     EMERGENCY FUNCTIONS                      //
+  // =============================================================//
+
+  function pause() external onlyOwner {
+    _pause();
+  }
+
+  function unpause() external onlyOwner {
+    require(!migrationMode, "Cannot unpause during migration");
+    _unpause();
+  }
+
+  function migration(address _newContract, uint256 _daysToMigration) external onlyOwner whenPaused {
+    require(_newContract != address(0), "Invalid address");
+    require(!migrationMode, "Migration already in progress");
+
+    migrationContract = _newContract;
+    migrationMode = true;
+    migrationCountdown = block.timestamp + (_daysToMigration * 1 days);
+
+    emit MigrationInitiated(_newContract, migrationCountdown);
+  }
+
+  function migrateFunds() external onlyOwner nonReentrant whenPaused {
+    require(migrationMode, "Not in migration mode");
+    require(migrationContract != address(0), "Migration contract not set");
+    require(block.timestamp >= migrationCountdown, "Migration countdown not reached");
+
+    uint256 balance = address(this).balance;
+    require(balance > 0, "No funds to migrate");
+
+    (bool success, ) = migrationContract.call{ value: balance }("");
+    require(success, "Migration transfer failed");
+
+    emit FundsTransferred(migrationContract, balance);
   }
 
   // =============================================================//
@@ -89,7 +136,7 @@ contract Play2048Wars is Manager2048Wars {
     bytes32 gameId,
     uint128[4] calldata boards,
     uint8[3] calldata moves
-  ) external correctGameId(msg.sender, gameId) {
+  ) external whenNotPaused correctGameId(msg.sender, gameId) {
     require(state[gameId].board == 0, GameIdUsed());
 
     // Check: this exact sequence of boards has not been played.
@@ -125,7 +172,11 @@ contract Play2048Wars is Manager2048Wars {
    * @param gameId The unique ID of the game.
    * @param resultBoard The result of applying a move on the latest board.
    */
-  function play(bytes32 gameId, uint8 move, uint128 resultBoard) external correctGameId(msg.sender, gameId) {
+  function play(
+    bytes32 gameId,
+    uint8 move,
+    uint128 resultBoard
+  ) external whenNotPaused correctGameId(msg.sender, gameId) {
     GameState memory latestState = state[gameId];
 
     // Validate move and calculate score from the actual merge logic
@@ -183,7 +234,7 @@ contract Play2048Wars is Manager2048Wars {
   //                           PUBLIC                             //
   // =============================================================//
 
-  function enterGame() public payable override {
+  function enterGame() public payable override whenNotPaused {
     // Check if player already has an active game
     require(playerGameId[msg.sender] == bytes32(0), "You already have an active game");
 
@@ -242,4 +293,6 @@ contract Play2048Wars is Manager2048Wars {
     nextMoveNumber = nextMove(gameId);
     score = currentScore(gameId);
   }
+
+  receive() external payable whenNotPaused {}
 }

@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
+import { base } from "viem/chains";
 import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
@@ -104,7 +105,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
           noPromptOnMfaRequired: false,
         },
         walletConnectCloudProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-        defaultChain: wagmiConfig.chains[0],
+        defaultChain: base,
         supportedChains: wagmiConfig.chains as any,
       }}
     >
