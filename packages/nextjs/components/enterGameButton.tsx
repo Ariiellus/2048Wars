@@ -2,7 +2,7 @@ import { useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, formatEther, parseEther } from "viem";
 import { base } from "viem/chains";
-import { useAccount, useBalance } from "wagmi";
+import { useBalance } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { GAME_CONTRACT_ADDRESS } from "~~/utils/constants";
 
@@ -16,7 +16,6 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
   const [isLoading, setIsLoading] = useState(false);
   const { ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const { address: wagmiAddress, isConnected } = useAccount();
 
   // Prioritize embedded wallet for seamless transactions
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
