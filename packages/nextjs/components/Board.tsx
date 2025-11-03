@@ -1,5 +1,5 @@
+import Countdown from "./counters/Countdown";
 import tileStyles from "~~/styles/2048styles/tile.module.css";
-import Countdown from "./Countdown";
 
 type Tile = {
   id: string;
@@ -19,13 +19,7 @@ type BoardProps = {
   initializeGame: () => void;
 };
 
-export default function Board({
-  containerRef,
-  tiles,
-  gameOver,
-  gameError,
-  resyncGame,
-}: BoardProps) {
+export default function Board({ containerRef, tiles, gameOver: _gameOver, gameError, resyncGame }: BoardProps) {
   // Get the background color for a tile based on its value
   const getTileColor = (value: number) => {
     switch (value) {
@@ -90,9 +84,11 @@ export default function Board({
                     style={{
                       transition: "all 150ms ease-in-out",
                       transform: tile.isNew ? "scale(0.5)" : "scale(1)",
-                      animation: tile.mergedFrom ? "merge 200ms ease-in-out" : tile.isNew
-                        ? "appear 200ms ease-in-out forwards"
-                        : "none",
+                      animation: tile.mergedFrom
+                        ? "merge 200ms ease-in-out"
+                        : tile.isNew
+                          ? "appear 200ms ease-in-out forwards"
+                          : "none",
                     }}
                   >
                     <span className={`font-bold ${getTileFontSize(tile.value)}`}>{tile.value}</span>

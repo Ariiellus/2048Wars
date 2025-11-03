@@ -31,6 +31,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "currentScore",
+          inputs: [
+            {
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint64",
+              internalType: "uint64",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "enterGame",
           inputs: [],
           outputs: [],
@@ -99,6 +118,11 @@ const deployedContracts = {
             },
             {
               name: "nextMoveNumber",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "score",
               type: "uint256",
               internalType: "uint256",
             },
@@ -259,8 +283,8 @@ const deployedContracts = {
           outputs: [
             {
               name: "",
-              type: "uint120",
-              internalType: "uint120",
+              type: "uint56",
+              internalType: "uint56",
             },
           ],
           stateMutability: "view",
@@ -482,9 +506,14 @@ const deployedContracts = {
               internalType: "uint8",
             },
             {
+              name: "score",
+              type: "uint64",
+              internalType: "uint64",
+            },
+            {
               name: "nextMove",
-              type: "uint120",
-              internalType: "uint120",
+              type: "uint56",
+              internalType: "uint56",
             },
             {
               name: "board",
@@ -832,7 +861,7 @@ const deployedContracts = {
   },
   84532: {
     Play2048Wars: {
-      address: "0xd61ee0bda105a829f0bc45b55984a12fd0944087",
+      address: "0x5328a93caf9cb22d07a91d0a988c0e9dbf9ce8f2",
       abi: [
         {
           type: "constructor",
@@ -853,6 +882,25 @@ const deployedContracts = {
         {
           type: "receive",
           stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "currentScore",
+          inputs: [
+            {
+              name: "gameId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint64",
+              internalType: "uint64",
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -924,6 +972,11 @@ const deployedContracts = {
             },
             {
               name: "nextMoveNumber",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "score",
               type: "uint256",
               internalType: "uint256",
             },
@@ -1084,8 +1137,8 @@ const deployedContracts = {
           outputs: [
             {
               name: "",
-              type: "uint120",
-              internalType: "uint120",
+              type: "uint56",
+              internalType: "uint56",
             },
           ],
           stateMutability: "view",
@@ -1307,9 +1360,14 @@ const deployedContracts = {
               internalType: "uint8",
             },
             {
+              name: "score",
+              type: "uint64",
+              internalType: "uint64",
+            },
+            {
               name: "nextMove",
-              type: "uint120",
-              internalType: "uint120",
+              type: "uint56",
+              internalType: "uint56",
             },
             {
               name: "board",
@@ -1652,7 +1710,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 33137720,
+      deployedOnBlock: 33182275,
     },
   },
 } as const;

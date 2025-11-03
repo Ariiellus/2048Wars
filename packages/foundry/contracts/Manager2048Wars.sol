@@ -69,15 +69,15 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
    * @notice This function will be more expensive the first time it is called after a new round has started
    */
   function enterGame() public payable virtual {
-    require(!isPlayer[msg.sender], "You already entered the game");
-    require(!isWinner[msg.sender], "You already won, wait for next round");
-
-    require(msg.value == entryFee, "Invalid entry fee");
-
     if (getTimeRemainingOfCurrentRound() == 0) {
       startNewRound();
     }
+    require(!isPlayer[msg.sender], "You already entered the game");
+    require(!isWinner[msg.sender], "You already won, wait for next round");
 
+    // Validate payment just before assigning role
+    require(msg.value == entryFee, "Invalid entry fee");
+    
     assignRoleToPlayer(msg.sender);
     emit GameEntered(msg.sender);
   }
@@ -109,7 +109,7 @@ contract Manager2048Wars is Ownable, ReentrancyGuard {
 
     uint256 pool = getCurrentRoundPool();
     require(pool > 0, "No pool to distribute");
-    
+
     uint256 amountPerWinner = pool / winnersList.length;
     require(amountPerWinner > 0, "Amount per winner too small");
 

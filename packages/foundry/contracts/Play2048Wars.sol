@@ -6,7 +6,8 @@ import { Manager2048Wars } from "./Manager2048Wars.sol";
 
 struct GameState {
   uint8 move;
-  uint120 nextMove;
+  uint64 score;
+  uint56 nextMove;
   uint128 board;
 }
 
@@ -98,23 +99,23 @@ contract Play2048Wars is Manager2048Wars {
     // Check: game has a valid start board.
     require(Board.validateStartPosition(boards[0]), GameBoardInvalid());
 
-    // Check: game has valid board transformations.
+    // Check: game has valid board transformations and calculate initial score.
+    uint64 totalScore = 0;
     for (uint256 i = 1; i < 4; i++) {
-      require(
-        Board.validateTransformation(
-          boards[i - 1],
-          moves[i - 1],
-          boards[i],
-          uint256(keccak256(abi.encodePacked(gameId, i)))
-        ),
-        GameBoardInvalid()
+      (uint128 expectedBoard, uint64 moveScore) = Board.processMove(
+        boards[i - 1],
+        moves[i - 1],
+        uint256(keccak256(abi.encodePacked(gameId, i)))
       );
+      require(expectedBoard == boards[i], GameBoardInvalid());
+      totalScore += moveScore;
     }
 
     // Mark the game-start as played.
     gameHashOf[hashedBoards] = gameId;
 
-    state[gameId] = GameState({ move: moves[2], nextMove: uint120(4), board: boards[3] });
+    // Set initial score from the first 3 moves
+    state[gameId] = GameState({ move: moves[2], score: totalScore, nextMove: uint56(4), board: boards[3] });
 
     emit NewGame(msg.sender, gameId, boards[3]);
   }
@@ -127,48 +128,37 @@ contract Play2048Wars is Manager2048Wars {
   function play(bytes32 gameId, uint8 move, uint128 resultBoard) external correctGameId(msg.sender, gameId) {
     GameState memory latestState = state[gameId];
 
-    // Check: playing a valid move.
-    require(
-      Board.validateTransformation(
-        latestState.board,
-        move,
-        resultBoard,
-        uint256(keccak256(abi.encodePacked(gameId, uint256(latestState.nextMove))))
-      ),
-      GameBoardInvalid()
+    // Validate move and calculate score from the actual merge logic
+    (uint128 expectedBoard, uint64 scoreIncrement) = Board.processMove(
+      latestState.board,
+      move,
+      uint256(keccak256(abi.encodePacked(gameId, uint256(latestState.nextMove))))
     );
+
+    // Check: playing a valid move (result board matches expected)
+    require(expectedBoard == resultBoard, GameBoardInvalid());
+
     emit NewMove(msg.sender, gameId, move, resultBoard);
 
-    // Update board.
-    state[gameId] = GameState({ move: move, nextMove: latestState.nextMove + 1, board: resultBoard });
+    uint64 newScore = latestState.score + scoreIncrement;
+
+    // Update board and score
+    state[gameId] = GameState({ move: move, score: newScore, nextMove: latestState.nextMove + 1, board: resultBoard });
 
     if (!Board.hasValidMovesRemaining(resultBoard)) {
-      if (hasTileReached2048(resultBoard)) {
-        gameWon(uint256(gameId), uint256(resultBoard), latestState.nextMove + 1, msg.sender);
+      if (Board.hasTileReached2048(resultBoard)) {
+        gameWon(uint256(gameId), newScore, latestState.nextMove + 1, msg.sender);
       } else {
         gameLost(uint256(gameId), msg.sender);
       }
-    } 
+    }
   }
 
   // =============================================================//
   //                           INTERNAL                           //
   // =============================================================//
 
-  function hasTileReached2048(uint128 board) internal pure returns (bool) {
-    // log₂(2048) = 11, so we check if any tile has log₂ value >= 11
-    // Check all 16 tile positions
-    for (uint8 i = 0; i < 16; i++) {
-      uint8 tileLogValue = Board.getTile(board, i);
-      if (tileLogValue >= 11) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   function gameWon(uint256 gameId, uint256 score, uint256 movesPlayed, address player) internal {
-
     playerFinalMoves[player] = movesPlayed;
     playerFinalScore[player] = score;
 
@@ -225,7 +215,7 @@ contract Play2048Wars is Manager2048Wars {
   //                             VIEW                             //
   // =============================================================//
 
-  function nextMove(bytes32 gameId) public view returns (uint120) {
+  function nextMove(bytes32 gameId) public view returns (uint56) {
     return state[gameId].nextMove;
   }
 
@@ -233,16 +223,23 @@ contract Play2048Wars is Manager2048Wars {
     return state[gameId].board;
   }
 
+  function currentScore(bytes32 gameId) public view returns (uint64) {
+    return state[gameId].score;
+  }
+
   /**
    * @notice Returns the latest board position of a game.
    * @dev Each array position stores the log_2 of that tile's value.
    * @param gameId The unique ID of a game.
    */
-  function getBoard(bytes32 gameId) external view returns (uint8[16] memory boardArr, uint256 nextMoveNumber) {
+  function getBoard(
+    bytes32 gameId
+  ) external view returns (uint8[16] memory boardArr, uint256 nextMoveNumber, uint256 score) {
     uint128 b = latestBoard(gameId);
     for (uint8 i = 0; i < 16; i++) {
       boardArr[i] = Board.getTile(b, i);
     }
     nextMoveNumber = nextMove(gameId);
+    score = currentScore(gameId);
   }
 }

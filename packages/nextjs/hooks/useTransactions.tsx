@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { publicClient } from "../utils/client";
 import { GAME_CONTRACT_ADDRESS } from "../utils/constants";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
@@ -17,7 +17,7 @@ export function useTransactions() {
   const userAddress = useRef("");
 
   // Resets nonce and balance
-  async function resetNonceAndBalance() {
+  const resetNonceAndBalance = useCallback(async () => {
     if (!user) {
       return;
     }
@@ -42,10 +42,6 @@ export function useTransactions() {
     userNonce.current = nonce;
     userBalance.current = balance;
     userAddress.current = privyUserAddress;
-  }
-
-  useEffect(() => {
-    resetNonceAndBalance();
   }, [user]);
 
   // Fetch provider on new login.
@@ -72,7 +68,6 @@ export function useTransactions() {
 
   // Sends a transaction and wait for receipt.
   async function sendRawTransactionAndConfirm({
-    successText,
     gas,
     data,
     nonce,
@@ -178,9 +173,10 @@ export function useTransactions() {
         number,
       ],
       bigint,
+      bigint,
     ]
   > {
-    const [latestBoard, nextMoveNumber] = await publicClient.readContract({
+    const [latestBoard, nextMoveNumber, score] = await publicClient.readContract({
       address: GAME_CONTRACT_ADDRESS,
       abi: [
         {
@@ -204,6 +200,11 @@ export function useTransactions() {
               type: "uint256",
               internalType: "uint256",
             },
+            {
+              name: "score",
+              type: "uint256",
+              internalType: "uint256",
+            },
           ],
           stateMutability: "view",
         },
@@ -212,7 +213,7 @@ export function useTransactions() {
       args: [gameId],
     });
 
-    return [latestBoard, nextMoveNumber];
+    return [latestBoard, nextMoveNumber, score];
   }
 
   // Initializes a game. Calls `prepareGame` and `startGame`.
@@ -323,7 +324,7 @@ export function useTransactions() {
     await sendRawTransactionAndConfirm({
       nonce,
       successText: `Played move ${moveCount}`,
-      gas: BigInt(300_000), // Increased for hasValidMovesRemaining check
+      gas: BigInt(400_000), // Includes move validation + hasValidMovesRemaining + score calculation + potential game end with winner assignment
       data: encodeFunctionData({
         abi: [
           {
