@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useWallets } from "@privy-io/react-auth";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import Play2048 from "~~/components/Play2048";
@@ -12,12 +13,19 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadCo
 import "~~/styles/2048styles/globals.css";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
+  const { address: wagmiAddress } = useAccount();
+  const { wallets } = useWallets();
+
+  // Prioritize embedded wallet for seamless transactions (same as EnterGameButton)
+  const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
+  const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
+  const activeWallet = embeddedWallet || externalWallet;
+  const connectedAddress = (activeWallet?.address || wagmiAddress) as `0x${string}` | undefined;
   const [isGameLoading, setIsGameLoading] = useState(false);
   const { data: playerGameId, refetch: refetchGameId } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getPlayerGameId",
-    args: [connectedAddress as `0x${string}`] as const,
+    args: [connectedAddress],
   });
 
   // Check if player has an active game (playerGameId != 0x0...0)
@@ -28,24 +36,20 @@ const Home: NextPage = () => {
     setIsGameLoading(true);
 
     // Poll for the gameId to be updated on-chain
-    let attempts = 0;
-    const maxAttempts = 10;
+    const pollForGameId = async () => {
+      while (true) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const result = await refetchGameId();
 
-    while (attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const result = await refetchGameId();
-
-      if (result.data && result.data !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-        // Game ID is now set, stop loading
-        setIsGameLoading(false);
-        return;
+        if (result.data && result.data !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+          // Game ID is now set, stop loading
+          setIsGameLoading(false);
+          return;
+        }
       }
+    };
 
-      attempts++;
-    }
-
-    // If we timeout, still stop loading
-    setIsGameLoading(false);
+    pollForGameId();
   };
 
   return (

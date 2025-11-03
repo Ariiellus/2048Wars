@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useWallets } from "@privy-io/react-auth";
-import { formatEther, parseEther } from "viem";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { Hex, createWalletClient, custom, encodeFunctionData, formatEther, parseEther } from "viem";
 import { base } from "viem/chains";
-import { useBalance } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
+import { GAME_CONTRACT_ADDRESS } from "~~/utils/constants";
 
 interface EnterGameButtonProps {
   heading?: string;
@@ -14,7 +14,9 @@ interface EnterGameButtonProps {
 
 export default function EnterGameButton({ heading = "Can you make it to 2048?", onGameEntered }: EnterGameButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
+  const { address: wagmiAddress, isConnected } = useAccount();
 
   // Prioritize embedded wallet for seamless transactions
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
@@ -32,27 +34,63 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
     functionName: "getEntryFee",
   });
 
-  const { writeContractAsync: writePlay2048WarsAsync } = useScaffoldWriteContract({
-    contractName: "Play2048Wars",
-  });
-
   // Check if user has enough ETH for entry fee + gas (0.0012 ETH total)
   const requiredAmount = parseEther("0.0012");
   const hasInsufficientFunds = balance && BigInt(balance.value) < requiredAmount;
 
   const handleEnterGame = async () => {
-    if (!entryFee) return;
+    if (!entryFee) {
+      console.error("Entry fee not loaded");
+      return;
+    }
+
+    if (!ready || !authenticated || !activeWallet) {
+      console.error("Wallet not connected");
+      return;
+    }
 
     try {
       setIsLoading(true);
-      await writePlay2048WarsAsync({
-        functionName: "enterGame",
-        value: BigInt(entryFee),
+
+      // Get Ethereum provider from Privy wallet
+      const ethereumProvider = await activeWallet.getEthereumProvider();
+      const walletClient = createWalletClient({
+        chain: base,
+        transport: custom(ethereumProvider),
       });
+
+      // Encode the function data
+      const data = encodeFunctionData({
+        abi: [
+          {
+            type: "function",
+            name: "enterGame",
+            inputs: [],
+            outputs: [],
+            stateMutability: "payable",
+          },
+        ],
+        functionName: "enterGame",
+      });
+
+      // Send transaction using Privy wallet directly
+      const txHash: Hex = await walletClient.sendTransaction({
+        account: address as Hex,
+        to: GAME_CONTRACT_ADDRESS,
+        data,
+        value: BigInt(entryFee),
+        chain: base,
+      });
+
+      console.log("Transaction sent:", txHash);
+
+      // Wait for the transaction to be mined and indexed
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       if (onGameEntered) {
         onGameEntered();
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Failed to enter game:", error);
       setIsLoading(false);
@@ -86,7 +124,7 @@ export default function EnterGameButton({ heading = "Can you make it to 2048?", 
                   : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             }`}
             onClick={handleEnterGame}
-            disabled={isLoading || hasInsufficientFunds || !entryFee || !balance}
+            disabled={isLoading || hasInsufficientFunds || !entryFee}
           >
             {isLoading ? "Processing..." : hasInsufficientFunds ? "Insufficient Funds" : "Enter Game"}
           </button>
