@@ -54,15 +54,12 @@ export default function Game2048() {
 
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [gameError, setGameError] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_gameErrorText, setGameErrorText] = useState<string>("");
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [faucetModalOpen, setFaucetModalOpen] = useState<boolean>(false);
-
   const [activeGameId, setActiveGameId] = useState<Hex>("0x");
   const [encodedMoves, setEncodedMoves] = useState<EncodedMove[]>([]);
   const [playedMovesCount, setPlayedMovesCount] = useState<number>(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_lastMoveScoreIncrement, setLastMoveScoreIncrement] = useState<number>(0);
   const [localScore, setLocalScore] = useState<number>(0); // Local cumulative score
 
@@ -131,13 +128,13 @@ export default function Game2048() {
     let touchStartY = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault(); // 👈 this is key to prevent scroll
+      e.preventDefault();
       touchStartX = e.changedTouches[0].screenX;
       touchStartY = e.changedTouches[0].screenY;
     };
 
     const handleTouchEnd = async (e: TouchEvent) => {
-      e.preventDefault(); // 👈 also here
+      e.preventDefault();
       if (!user || gameOver || isAnimating) return;
 
       const touchEndX = e.changedTouches[0].screenX;
@@ -168,8 +165,7 @@ export default function Game2048() {
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchend", handleTouchEnd);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user, boardState, gameOver, isAnimating, faucetModalOpen]);
 
   // Move tiles in the specified direction
   const move = async (direction: Direction) => {
@@ -390,8 +386,7 @@ export default function Game2048() {
         initializeGame();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [address, contractGameId, boardState.tiles.length, gameOver, gameError, isAnimating]);
 
   // Initialize the game with two random tiles
   const initializeGame = () => {
