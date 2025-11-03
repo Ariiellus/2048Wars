@@ -8,7 +8,7 @@ export function clearCorruptedCheckpoints() {
   let cleared = 0;
 
   keys.forEach(key => {
-    if (key.includes('game-') && (key.includes('-checkpoint') || key.includes('-moves'))) {
+    if (key.includes("game-") && (key.includes("-checkpoint") || key.includes("-moves"))) {
       localStorage.removeItem(key);
       cleared++;
       console.log(`🗑️ Cleared: ${key}`);
@@ -16,10 +16,10 @@ export function clearCorruptedCheckpoints() {
   });
 
   console.log(`✅ Cleared ${cleared} checkpoint items`);
-  console.log('Please refresh the page and start a new game');
+  console.log("Please refresh the page and start a new game");
 }
 
 // Make it available globally in dev
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   (window as any).clearCorruptedCheckpoints = clearCorruptedCheckpoints;
 }

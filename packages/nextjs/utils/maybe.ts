@@ -3,9 +3,7 @@
  * Eliminates the need for explicit null/undefined checks
  */
 
-export type Maybe<T> =
-  | { hasValue: true; value: T }
-  | { hasValue: false };
+export type Maybe<T> = { hasValue: true; value: T } | { hasValue: false };
 
 /**
  * Create a Maybe with a value
@@ -45,10 +43,7 @@ export const map = <T, U>(maybe: Maybe<T>, fn: (value: T) => U): Maybe<U> => {
 /**
  * Chain Maybe-returning functions
  */
-export const flatMap = <T, U>(
-  maybe: Maybe<T>,
-  fn: (value: T) => Maybe<U>
-): Maybe<U> => {
+export const flatMap = <T, U>(maybe: Maybe<T>, fn: (value: T) => Maybe<U>): Maybe<U> => {
   if (maybe.hasValue) {
     return fn(maybe.value);
   }
@@ -58,10 +53,7 @@ export const flatMap = <T, U>(
 /**
  * Filter a Maybe based on a predicate
  */
-export const filter = <T>(
-  maybe: Maybe<T>,
-  predicate: (value: T) => boolean
-): Maybe<T> => {
+export const filter = <T>(maybe: Maybe<T>, predicate: (value: T) => boolean): Maybe<T> => {
   if (maybe.hasValue && predicate(maybe.value)) {
     return maybe;
   }
@@ -76,7 +68,7 @@ export const match = <T, R>(
   patterns: {
     some: (value: T) => R;
     none: () => R;
-  }
+  },
 ): R => {
   if (maybe.hasValue) {
     return patterns.some(maybe.value);

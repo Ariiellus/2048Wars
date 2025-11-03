@@ -1712,6 +1712,138 @@ const deployedContracts = {
       inheritedFunctions: {},
       deployedOnBlock: 33182275,
     },
+    BasicMath: {
+      address: "0x2f4696feadc86a45f309b54a42dcf1bdf16c6970",
+      abi: [
+        {
+          type: "function",
+          name: "adder",
+          inputs: [
+            {
+              name: "_a",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_b",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "sum",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "error",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "subtractor",
+          inputs: [
+            {
+              name: "_a",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_b",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "difference",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "error",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "pure",
+        },
+      ],
+      inheritedFunctions: {},
+      deployedOnBlock: 33216887,
+    },
+  },
+  11155111: {
+    BasicMath: {
+      address: "0xf9b391038106996350430b3554113a5119780be5",
+      abi: [
+        {
+          type: "function",
+          name: "adder",
+          inputs: [
+            {
+              name: "_a",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_b",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "sum",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "error",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "subtractor",
+          inputs: [
+            {
+              name: "_a",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_b",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "difference",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "error",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "pure",
+        },
+      ],
+      inheritedFunctions: {},
+      deployedOnBlock: 9553996,
+    },
   },
 } as const;
 

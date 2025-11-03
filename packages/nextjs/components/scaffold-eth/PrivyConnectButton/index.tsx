@@ -16,7 +16,7 @@ import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
 
 export const PrivyConnectButton = () => {
-  const { ready, authenticated, login, logout } = usePrivy();
+  const { ready, authenticated, login, logout, user } = usePrivy();
   const { wallets } = useWallets();
   const [mounted, setMounted] = useState(false);
   const [selectingNetwork, setSelectingNetwork] = useState(false);
@@ -25,6 +25,16 @@ export const PrivyConnectButton = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (ready && user) {
+      console.log("Privy user authenticated:", {
+        id: user.id,
+        farcaster: user.farcaster,
+        linkedAccounts: user.linkedAccounts,
+      });
+    }
+  }, [ready, user]);
 
   // Prioritize embedded wallet for seamless transactions
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
@@ -56,7 +66,13 @@ export const PrivyConnectButton = () => {
 
   if (!authenticated) {
     return (
-      <button className="btn btn-primary btn-sm" onClick={login}>
+      <button
+        className="btn btn-primary btn-sm"
+        onClick={() => {
+          console.log("Login button clicked, Privy ready:", ready);
+          login();
+        }}
+      >
         Connect Wallet
       </button>
     );

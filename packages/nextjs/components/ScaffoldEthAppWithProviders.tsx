@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -39,6 +40,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
+  const [isInFarcaster, setIsInFarcaster] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -66,23 +68,43 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
     };
   }, []);
 
+  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || "";
+
+  if (!privyAppId) {
+    console.warn("NEXT_PUBLIC_PRIVY_APP_ID is not set!");
+  }
+
+  // Configure login methods based on context
+  const loginMethods = isInFarcaster ? ["email", "wallet"] : ["email", "wallet"];
+
   return (
     <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
+      appId={privyAppId}
       config={{
         appearance: {
           theme: mounted ? (isDarkMode ? "dark" : "light") : "light",
           accentColor: "#2299dd",
           logo: "/2048Wars-Logo.png",
+          landingHeader: isInFarcaster ? "Sign in with Farcaster" : "Connect Wallet",
+          loginMessage: isInFarcaster ? "Sign in to play 2048Wars" : "Sign in to continue",
         },
-        loginMethods: ["email", "farcaster"],
+        loginMethods: loginMethods as any,
         embeddedWallets: {
           ethereum: {
             createOnLogin: "all-users",
           },
           showWalletUIs: false,
         },
-        walletConnectCloudProjectId: undefined,
+        externalWallets: {
+          coinbaseWallet: {},
+          walletConnect: {
+            enabled: true,
+          },
+        },
+        mfa: {
+          noPromptOnMfaRequired: false,
+        },
+        walletConnectCloudProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
         defaultChain: wagmiConfig.chains[0],
         supportedChains: wagmiConfig.chains as any,
       }}

@@ -222,6 +222,15 @@ export function useTransactions() {
     boards: readonly [bigint, bigint, bigint, bigint],
     moves: readonly [number, number, number],
   ): Promise<void> {
+    // Ensure userAddress is set
+    if (!userAddress.current) {
+      await resetNonceAndBalance();
+    }
+
+    if (!userAddress.current) {
+      throw Error("User address not available.");
+    }
+
     // Fetch fresh balance to avoid stale data
     const freshBalance = await publicClient.getBalance({
       address: userAddress.current as Hex,
@@ -304,6 +313,15 @@ export function useTransactions() {
   async function playNewMoveTransaction(gameId: Hex, board: bigint, move: number, moveCount: number): Promise<void> {
     // Sign and send transaction: play move
     console.log(`Playing move ${moveCount}!`);
+
+    // Ensure userAddress is set
+    if (!userAddress.current) {
+      await resetNonceAndBalance();
+    }
+
+    if (!userAddress.current) {
+      throw Error("User address not available.");
+    }
 
     // Fetch fresh balance to avoid stale data
     const freshBalance = await publicClient.getBalance({

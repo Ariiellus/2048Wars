@@ -3,9 +3,7 @@
  * Use this instead of throwing exceptions for predictable error handling
  */
 
-export type Result<T, E> =
-  | { success: true; value: T }
-  | { success: false; error: E };
+export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
 
 /**
  * Create a successful Result
@@ -26,10 +24,7 @@ export const err = <T = never, E = unknown>(error: E): Result<T, E> => ({
 /**
  * Transform the value inside a successful Result
  */
-export const map = <T, U, E>(
-  result: Result<T, E>,
-  fn: (value: T) => U
-): Result<U, E> => {
+export const map = <T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> => {
   if (result.success) {
     return ok(fn(result.value));
   }
@@ -39,10 +34,7 @@ export const map = <T, U, E>(
 /**
  * Transform the error inside a failed Result
  */
-export const mapErr = <T, E, F>(
-  result: Result<T, E>,
-  fn: (error: E) => F
-): Result<T, F> => {
+export const mapErr = <T, E, F>(result: Result<T, E>, fn: (error: E) => F): Result<T, F> => {
   if (!result.success) {
     return err(fn(result.error));
   }
@@ -52,10 +44,7 @@ export const mapErr = <T, E, F>(
 /**
  * Chain Result-returning functions
  */
-export const flatMap = <T, U, E>(
-  result: Result<T, E>,
-  fn: (value: T) => Result<U, E>
-): Result<U, E> => {
+export const flatMap = <T, U, E>(result: Result<T, E>, fn: (value: T) => Result<U, E>): Result<U, E> => {
   if (result.success) {
     return fn(result.value);
   }
@@ -70,7 +59,7 @@ export const match = <T, E, R>(
   patterns: {
     ok: (value: T) => R;
     err: (error: E) => R;
-  }
+  },
 ): R => {
   if (result.success) {
     return patterns.ok(result.value);
@@ -126,9 +115,7 @@ export const tryCatch = <T, E = Error>(fn: () => T): Result<T, E> => {
 /**
  * Wrap an async function in a Result (catches exceptions)
  */
-export const asyncTryCatch = async <T, E = Error>(
-  fn: () => Promise<T>
-): Promise<Result<T, E>> => {
+export const asyncTryCatch = async <T, E = Error>(fn: () => Promise<T>): Promise<Result<T, E>> => {
   try {
     const value = await fn();
     return ok(value);
@@ -157,10 +144,7 @@ export const combine = <T, E>(results: Result<T, E>[]): Result<T[], E> => {
 /**
  * Convert a nullable value to a Result
  */
-export const fromNullable = <T, E>(
-  value: T | null | undefined,
-  error: E
-): Result<T, E> => {
+export const fromNullable = <T, E>(value: T | null | undefined, error: E): Result<T, E> => {
   if (value === null || value === undefined) {
     return err(error);
   }

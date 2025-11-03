@@ -4494,7 +4494,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     next: "npm:15.5.3"
     next-nprogress-bar: "npm:~2.3.13"
-    next-themes: "npm:~0.3.0"
+    next-themes: "npm:^0.4.6"
     postcss: "npm:~8.4.45"
     prettier: "npm:^3.6.2"
     qrcode.react: "npm:~4.0.1"
@@ -13602,13 +13602,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-themes@npm:~0.3.0":
-  version: 0.3.0
-  resolution: "next-themes@npm:0.3.0"
+"next-themes@npm:^0.4.6":
+  version: 0.4.6
+  resolution: "next-themes@npm:0.4.6"
   peerDependencies:
-    react: ^16.8 || ^17 || ^18
-    react-dom: ^16.8 || ^17 || ^18
-  checksum: 10/4285c4969eac517ad7addd773bcb71e7d14bc6c6e3b24eb97b80a6e06ac03fb6cb345e75dfb448156d14430d06289948eb8cfdeb52402ca7ce786093d01d2878
+    react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+  checksum: 10/48540e77a8f1967fa27338e91037df296f84d8979ba3003f71eed8d9a2f4f29b3cc6797d27b501547fd39cf33611a2accb432eec92ad8a457abe1a142cc5a02e
   languageName: node
   linkType: hard
 

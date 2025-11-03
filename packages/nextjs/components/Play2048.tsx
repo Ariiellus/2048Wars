@@ -54,12 +54,14 @@ export default function Game2048() {
 
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [gameError, setGameError] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_gameErrorText, setGameErrorText] = useState<string>("");
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [faucetModalOpen, setFaucetModalOpen] = useState<boolean>(false);
   const [activeGameId, setActiveGameId] = useState<Hex>("0x");
   const [encodedMoves, setEncodedMoves] = useState<EncodedMove[]>([]);
   const [playedMovesCount, setPlayedMovesCount] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_lastMoveScoreIncrement, setLastMoveScoreIncrement] = useState<number>(0);
   const [localScore, setLocalScore] = useState<number>(0); // Local cumulative score
 
@@ -165,6 +167,7 @@ export default function Game2048() {
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchend", handleTouchEnd);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, boardState, gameOver, isAnimating, faucetModalOpen]);
 
   // Move tiles in the specified direction
@@ -386,6 +389,7 @@ export default function Game2048() {
         initializeGame();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, contractGameId, boardState.tiles.length, gameOver, gameError, isAnimating]);
 
   // Initialize the game with two random tiles
