@@ -61,7 +61,7 @@ export const PrivyConnectButton = () => {
 
   if (!ready || !mounted) {
     return (
-      <button className="btn btn-primary btn-sm" disabled>
+      <button className="px-6 py-3 rounded-xl font-semibold text-base text-white bg-blue-400 cursor-wait" disabled>
         Loading...
       </button>
     );
@@ -70,7 +70,7 @@ export const PrivyConnectButton = () => {
   if (!authenticated) {
     return (
       <button
-        className="btn btn-primary btn-sm"
+        className="px-6 py-3 rounded-xl font-semibold text-base text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
         onClick={() => {
           console.log("Login button clicked, Privy ready:", ready);
           login();
