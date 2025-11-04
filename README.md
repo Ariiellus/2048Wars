@@ -1,33 +1,78 @@
-# Welcome to 2048Wars!
+> **The classic 2048 game with a competitive twist - compete for weekly ETH rewards!**
 
-2048Wars is the classic 2048 game with a twist. You can win weekly rewards by getting into the top 10. Each game costs 0.001 ETH. 50% of the pool is distributed to the winners of the round and the other 50% is used to fund the next round.
+2048Wars combines the addictive gameplay of 2048 with blockchain technology, allowing players to compete for weekly prizes. Each game costs **0.001 ETH** to enter, and all winners who reach 2048 split **50% of the prize pool**, while the remaining **50% funds the next round**.
 
-Check out these resources to deep dive into the game:
+## Features
+
+- **Competitive Play**: Compete against other players for weekly rewards
+- **Prize Pool**: 50% distributed to winners, 50% funds next round
+- **On-Chain Gameplay**: All game logic and scores stored on-chain
+- **Built on Base**: Fast and low-cost transactions
+- **Leaderboard**: Real-time ranking system
+
+## Game Rules
+
+2048Wars follows the traditional 2048 game mechanics:
+
+- **Grid**: Played on a 4×4 grid
+- **Controls**: Use arrow keys (↑ ↓ ← →) or swipe gestures
+- **Starting State**: Game begins with two tiles with value 2
+- **New Tiles**: After each move, a new tile appears randomly in an empty space
+- **Merging**: When two tiles of the same value collide, they merge into their sum
+- **Non-Greedy Movement**: A tile cannot merge twice in the same move
+- **Victory**: Win by creating a tile with at least value **2048**
+- **Game Over**: Ends when no valid moves are possible
+
+> **Fun Fact**: The largest theoretically possible tile is **131,072**!
+
+## How to Play
+
+1. **Connect Your Wallet**: Click "Connect Wallet" and approve the connection
+2. **Enter the Game**: Pay the **0.001 ETH** entry fee to start a new game
+3. **Play**: Use arrow keys or swipe to move tiles and merge them
+4. **Reach 2048**: Try to create the 2048 tile to win!
+5. **Compete**: Climb the leaderboard and reach 2048 to become a winner and earn prizes
+6. **Claim Rewards**: Every week, winners receive their share of the prize pool
+
+### Tips for Success
+
+- Plan your moves ahead to avoid getting stuck
+- Keep your highest tile in a corner
+- Focus on maintaining one main direction of movement
+- Watch the timer - rounds end weekly!
+
+## Smart Contracts
+
+### Network: Base Mainnet
+
+- **Chain ID**: `8453`
+- **Contract Address**: `0xab28bFd96898Fe18d3cB956a8A2BEa7B09a469d1`
+
+### Contract Functions
+
+- `enterGame()` - Pay entry fee and start a new game
+- `makeMove(direction)` - Execute a game move
+- `getPlayerGameId(address)` - Get current game ID for a player
+- `getAllWinners()` - Get list of round winners
+- `getCurrentRoundPool()` - Get current prize pool amount
+- `getTimeRemainingOfCurrentRound()` - Get time remaining in current round
+
+## Technology Stack
+
+- **Frontend**: Next.js, React, TypeScript, TailwindCSS
+- **Blockchain**: Solidity, Foundry, Hardhat
+- **Wallet**: Privy, Wagmi, RainbowKit
+- **Network**: Base (Coinbase's L2)
+
+## Resources
+
+Learn more about 2048 and game development:
 
 - [Create 2048 Game From Scratch Course](https://www.udemy.com/share/10acpw3@_RWwH14KAy8taXto5sfMrrU18LqLPwYgjjjs4Ghy1wYSwoeug-8iMoZG_N9UixP2/)
 - [The Mathematics of 2048](https://jdlm.info/articles/2018/03/18/markov-decision-process-2048.html)
 - [2048: A Guide to Building High Performance Games on Monad](https://blog.monad.xyz/blog/build-2048)
 - [2048 Source Code by Gabriele Cirulli](https://github.com/gabrielecirulli/2048?tab=readme-ov-file)
 
-## Game rules
+## Contributing
 
-This game follows the traditional 2048 game rules:
-
-- The game is played on a 4x4 grid.
-- Only legal moves are up, down, left, right.
-- The game begins with two tiles with value 2 on the board.
-- After each move, a new tile will randomly appear in a random empty space on the board.
-- When two tiles of the same value collide, they merge into a single tile with the sum of their values.
-- The resulting tile cannot merge with another tile again during the same move (known as "non-greedy" movement).
-- The game is won when a tile with a value of 2048 appears on the board.
-- The game ends when there are no empty spaces left on the board and no adjacent tiles with the same value, meaning no valid moves are possible.
-
-Fun fact: the largest theoretically possible tile is 131,072.
-
-**Randomness:**
-To avoid determinism, the game picks offchain a random available cell, then adds a new tile either with value 2, with probability 0.9, or value 4, with probability 0.1.
-
-**Contract:**
-Base Sepolia: 84532
-
-## How to play
+Contributions are welcome! Please feel free to submit a Pull Request.
