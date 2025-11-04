@@ -3,7 +3,7 @@ import PlayerVerification from "./PlayerVerification";
 import { PrivyConnectButton } from "./scaffold-eth/PrivyConnectButton";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, formatEther, parseEther } from "viem";
-import { base, hardhat } from "viem/chains";
+import { base } from "viem/chains";
 import { useBalance } from "wagmi";
 import { useEnsureBaseChain, useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { GAME_CONTRACT_ADDRESS } from "~~/utils/constants";

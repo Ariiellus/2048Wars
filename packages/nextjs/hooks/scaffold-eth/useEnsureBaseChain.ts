@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWallets } from "@privy-io/react-auth";
 import { base } from "viem/chains";
 
@@ -11,7 +11,7 @@ export const useEnsureBaseChain = (autoSwitch: boolean = false) => {
   const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
   const activeWallet = embeddedWallet || externalWallet;
 
-  const switchToBase = async () => {
+  const switchToBase = useCallback(async () => {
     if (!activeWallet) return false;
 
     try {
@@ -62,7 +62,7 @@ export const useEnsureBaseChain = (autoSwitch: boolean = false) => {
     } finally {
       setIsSwitching(false);
     }
-  };
+  }, [activeWallet]);
 
   useEffect(() => {
     const checkChain = async () => {
@@ -85,7 +85,7 @@ export const useEnsureBaseChain = (autoSwitch: boolean = false) => {
     };
 
     checkChain();
-  }, [activeWallet, autoSwitch]);
+  }, [activeWallet, autoSwitch, switchToBase]);
 
   return {
     isCorrectChain,

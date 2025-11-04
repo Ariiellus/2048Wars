@@ -112,7 +112,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
           return;
         }
         originalError.call(console, ...args);
-      } catch (e) {
+      } catch {
         // Silently fail - don't create error loops
       }
     };
