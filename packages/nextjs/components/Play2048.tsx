@@ -8,7 +8,6 @@ import { Hex, encodePacked, hexToBigInt, keccak256, toHex } from "viem";
 // UI
 import Board from "~~/components/Board";
 import Container from "~~/components/Container";
-import { FaucetDialog } from "~~/components/FaucetDialog";
 import Moves from "~~/components/counters/moves";
 import Score from "~~/components/counters/score";
 import { Toaster } from "~~/components/ui/sonner";
@@ -57,7 +56,6 @@ export default function Game2048() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_gameErrorText, setGameErrorText] = useState<string>("");
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const [faucetModalOpen, setFaucetModalOpen] = useState<boolean>(false);
   const [activeGameId, setActiveGameId] = useState<Hex>("0x");
   const [encodedMoves, setEncodedMoves] = useState<EncodedMove[]>([]);
   const [playedMovesCount, setPlayedMovesCount] = useState<number>(0);
@@ -94,10 +92,6 @@ export default function Game2048() {
 
       setIsAnimating(false);
     }
-
-    if (error.message.includes("insufficient balance")) {
-      setFaucetModalOpen(true);
-    }
   }
 
   // Handle keyboard / swipe events
@@ -108,7 +102,7 @@ export default function Game2048() {
     if (!container) return;
 
     const handleKeyDown = async (event: KeyboardEvent) => {
-      if (!user || gameOver || isAnimating || faucetModalOpen) return;
+      if (!user || gameOver || isAnimating) return;
 
       switch (event.key) {
         case "ArrowUp":
@@ -137,7 +131,7 @@ export default function Game2048() {
 
     const handleTouchEnd = async (e: TouchEvent) => {
       e.preventDefault();
-      if (!user || gameOver || isAnimating) return;
+      if (!user || gameOver || isAnimating || gameError) return;
 
       const touchEndX = e.changedTouches[0].screenX;
       const touchEndY = e.changedTouches[0].screenY;
@@ -168,7 +162,7 @@ export default function Game2048() {
       container.removeEventListener("touchend", handleTouchEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, boardState, gameOver, isAnimating, faucetModalOpen]);
+  }, [user, boardState, gameOver, isAnimating, gameError]);
 
   // Move tiles in the specified direction
   const move = async (direction: Direction) => {
@@ -729,8 +723,6 @@ export default function Game2048() {
             initializeGame={initializeGame}
           />
         </div>
-
-        <FaucetDialog resyncGame={resyncGame} isOpen={faucetModalOpen} setIsOpen={setFaucetModalOpen} />
       </div>
 
       <Toaster

@@ -45,26 +45,81 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   useEffect(() => {
     setMounted(true);
 
-    // Suppress Privy's internal DOM warnings
+    // Suppress Privy's internal DOM warnings and empty errors
     const originalError = console.error;
+    const originalWarn = console.warn;
+    let isInitializing = true;
+
+    // Allow errors to flow after initial mount
+    setTimeout(() => {
+      isInitializing = false;
+    }, 2000);
+
     console.error = (...args: any[]) => {
-      const msg = args[0]?.toString() || "";
-      if (
-        msg.includes("clip-path") ||
-        msg.includes("clipPath") ||
-        msg.includes("Invalid DOM property") ||
-        msg.includes("cannot be a descendant of") ||
-        msg.includes("cannot contain a nested") ||
-        msg.includes("React does not recognize") ||
-        msg.includes("isActive")
-      ) {
-        return;
+      // During initialization, suppress all Privy-related errors
+      if (isInitializing) {
+        const stack = new Error().stack || "";
+        if (stack.includes("privy") || stack.includes("Privy") || stack.includes("@privy-io")) {
+          return;
+        }
       }
-      originalError.apply(console, args);
+
+      // Skip if no arguments
+      if (args.length === 0) return;
+
+      // Check first argument for empty object patterns
+      const firstArg = args[0];
+
+      // Skip null or undefined
+      if (firstArg === null || firstArg === undefined) return;
+
+      // Skip empty objects - check multiple ways
+      if (typeof firstArg === "object") {
+        try {
+          const keys = Object.keys(firstArg);
+          const stringified = JSON.stringify(firstArg);
+
+          // Skip if empty object by any measure
+          if (keys.length === 0 || stringified === "{}" || stringified === "[]" || stringified === "null") {
+            return;
+          }
+        } catch {
+          // If object operations fail, skip it to be safe
+          return;
+        }
+      }
+
+      try {
+        const msg = String(firstArg);
+        const stringified = typeof firstArg === "object" ? JSON.stringify(firstArg) : "";
+
+        if (
+          !msg || // Skip empty strings
+          msg === "[object Object]" || // Skip generic object toString
+          msg === "undefined" ||
+          msg === "null" ||
+          msg.includes("clip-path") ||
+          msg.includes("clipPath") ||
+          msg.includes("Invalid DOM property") ||
+          msg.includes("cannot be a descendant of") ||
+          msg.includes("cannot contain a nested") ||
+          msg.includes("React does not recognize") ||
+          msg.includes("isActive") ||
+          msg.includes('Each child in a list should have a unique "key" prop') ||
+          stringified.includes("wallet_requestPermissions") || // Skip duplicate wallet permission requests
+          stringified.includes("Connection request already pending")
+        ) {
+          return;
+        }
+        originalError.call(console, ...args);
+      } catch (e) {
+        // Silently fail - don't create error loops
+      }
     };
 
     return () => {
       console.error = originalError;
+      console.warn = originalWarn;
     };
   }, []);
 

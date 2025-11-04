@@ -239,7 +239,7 @@ export function useTransactions() {
     console.log("Fresh balance:", formatEther(freshBalance), "ETH");
     console.log("Balance in wei:", freshBalance.toString());
 
-    if (parseFloat(formatEther(freshBalance)) < 0.0001) {
+    if (parseFloat(formatEther(freshBalance)) < 0.000001) {
       throw Error("Signer has insufficient balance.");
     }
 
@@ -331,7 +331,7 @@ export function useTransactions() {
     console.log("Fresh balance:", formatEther(freshBalance), "ETH");
     console.log("Balance in wei:", freshBalance.toString());
 
-    if (parseFloat(formatEther(freshBalance)) < 0.0001) {
+    if (parseFloat(formatEther(freshBalance)) < 0.000001) {
       throw Error("Signer has insufficient balance.");
     }
 

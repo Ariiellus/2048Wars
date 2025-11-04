@@ -13,7 +13,7 @@ import {
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
 import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
-import { useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
+import { useCopyToClipboard, useEnsureBaseChain, useOutsideClick } from "~~/hooks/scaffold-eth";
 
 export const PrivyConnectButton = () => {
   const { ready, authenticated, login, logout, user } = usePrivy();
@@ -21,6 +21,9 @@ export const PrivyConnectButton = () => {
   const [mounted, setMounted] = useState(false);
   const [selectingNetwork, setSelectingNetwork] = useState(false);
   const dropdownRef = useRef<HTMLDetailsElement>(null);
+
+  // Auto-switch to Base chain when wallet connects
+  useEnsureBaseChain(true);
 
   useEffect(() => {
     setMounted(true);
@@ -82,7 +85,7 @@ export const PrivyConnectButton = () => {
 
   const checkSumAddress = getAddress(address);
   const displayName = `${checkSumAddress.slice(0, 6)}...${checkSumAddress.slice(-4)}`;
-  const blockExplorerAddressLink = `https://sepolia.basescan.org/address/${checkSumAddress}`;
+  const blockExplorerAddressLink = `https://basescan.org/address/${checkSumAddress}`;
 
   return (
     <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
