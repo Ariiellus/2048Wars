@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Play2048 from "~~/components/Play2048";
 import CurrentPool from "~~/components/counters/currentPool";
@@ -21,6 +21,13 @@ const Home: NextPage = () => {
     args: [connectedAddress],
   });
 
+  // Refetch player game ID when component mounts or address changes to get fresh data
+  useEffect(() => {
+    if (connectedAddress) {
+      refetchGameId();
+    }
+  }, [connectedAddress, refetchGameId]);
+
   const { data: getCurrentRoundPool } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getCurrentRoundPool",
@@ -36,12 +43,24 @@ const Home: NextPage = () => {
     functionName: "getEntryFee",
   });
 
-  const { data: winnersList } = useScaffoldReadContract({
+  const { data: winnersList, refetch: refetchWinnersList } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getAllWinners",
   });
 
   const isWinner = winnersList && connectedAddress && winnersList.includes(connectedAddress as `0x${string}`);
+
+  // Poll for updates every 3 seconds to catch game state changes quickly
+  useEffect(() => {
+    if (!connectedAddress) return;
+
+    const pollInterval = setInterval(() => {
+      refetchGameId();
+      refetchWinnersList();
+    }, 3000);
+
+    return () => clearInterval(pollInterval);
+  }, [connectedAddress, refetchGameId, refetchWinnersList]);
 
   // Check if player has an active game (playerGameId != 0x0...0)
   const hasActiveGame =
