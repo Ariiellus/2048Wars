@@ -1,5 +1,5 @@
 import { formatEther } from "viem";
-import { base } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { useBalance } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
@@ -12,7 +12,7 @@ interface PlayerVerificationProps {
 export default function PlayerVerification({ address, hasInsufficientFunds, amountNeeded }: PlayerVerificationProps) {
   const { data: balance } = useBalance({
     address: address,
-    chainId: base.id,
+    chainId: baseSepolia.id,
   });
 
   const { data: winnersList } = useScaffoldReadContract({

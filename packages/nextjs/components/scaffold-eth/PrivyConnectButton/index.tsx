@@ -2,18 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { useTheme } from "next-themes";
 import { getAddress } from "viem";
-import { useBalance } from "wagmi";
+import { useAccount, useBalance, useSwitchChain } from "wagmi";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowTopRightOnSquareIcon,
+  ArrowsRightLeftIcon,
   CheckCircleIcon,
   ChevronDownIcon,
   DocumentDuplicateIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
 import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
-import { useCopyToClipboard, useEnsureBaseChain, useOutsideClick } from "~~/hooks/scaffold-eth";
+import { getNetworkColor, useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
+import { getTargetNetworks } from "~~/utils/scaffold-eth";
+import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth/networks";
+
+const allowedNetworks = getTargetNetworks();
 
 export const PrivyConnectButton = () => {
   const { ready, authenticated, login, logout, user } = usePrivy();
@@ -21,9 +27,10 @@ export const PrivyConnectButton = () => {
   const [mounted, setMounted] = useState(false);
   const [selectingNetwork, setSelectingNetwork] = useState(false);
   const dropdownRef = useRef<HTMLDetailsElement>(null);
-
-  // Auto-switch to Base chain when wallet connects
-  useEnsureBaseChain(true);
+  const { switchChain } = useSwitchChain();
+  const { chain } = useAccount();
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
 
   useEffect(() => {
     setMounted(true);
@@ -85,7 +92,7 @@ export const PrivyConnectButton = () => {
 
   const checkSumAddress = getAddress(address);
   const displayName = `${checkSumAddress.slice(0, 6)}...${checkSumAddress.slice(-4)}`;
-  const blockExplorerAddressLink = `https://basescan.org/address/${checkSumAddress}`;
+  const blockExplorerAddressLink = chain ? getBlockExplorerAddressLink(chain, checkSumAddress) : "#";
 
   return (
     <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
@@ -143,6 +150,32 @@ export const PrivyConnectButton = () => {
             </span>
           </div>
         </li>
+        {allowedNetworks
+          .filter(allowedNetwork => allowedNetwork.id !== chain?.id)
+          .map(allowedNetwork => (
+            <li key={allowedNetwork.id} className={selectingNetwork ? "hidden" : ""}>
+              <button
+                className="menu-item h-8 btn-sm rounded-xl! flex gap-3 py-3"
+                type="button"
+                onClick={() => {
+                  switchChain?.({ chainId: allowedNetwork.id });
+                  closeDropdown();
+                }}
+              >
+                <ArrowsRightLeftIcon className="h-6 w-4 ml-2 sm:ml-0" />
+                <span className="whitespace-nowrap">
+                  Switch to{" "}
+                  <span
+                    style={{
+                      color: getNetworkColor(allowedNetwork, isDarkMode),
+                    }}
+                  >
+                    {allowedNetwork.name}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
         <li className={selectingNetwork ? "hidden" : ""}>
           <button
             className="menu-item text-error h-8 btn-sm rounded-xl! flex gap-3 py-3"

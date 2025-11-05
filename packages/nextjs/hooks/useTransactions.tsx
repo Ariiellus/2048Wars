@@ -4,7 +4,7 @@ import { GAME_CONTRACT_ADDRESS } from "../utils/constants";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, formatEther } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
-import { base } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 
 export function useTransactions() {
   // User and Wallet objects.
@@ -55,7 +55,7 @@ export function useTransactions() {
 
       const ethereumProvider = await userWallet.getEthereumProvider();
       const provider = createWalletClient({
-        chain: base,
+        chain: baseSepolia,
         transport: custom(ethereumProvider),
       });
 
@@ -123,7 +123,7 @@ export function useTransactions() {
         gas,
         maxFeePerGas: optimizedMaxFeePerGas,
         maxPriorityFeePerGas: optimizedMaxPriorityFeePerGas,
-        chain: base,
+        chain: baseSepolia,
         type: "eip1559",
       });
 

@@ -1,15 +1,12 @@
 import { createPublicClient, http } from "viem";
-import { base } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 
-// Prefer explicit URL, else build Coinbase Base mainnet URL from key, else default chain RPC
+// Prefer explicit URL, else use Base Sepolia RPC
 const rpc =
   process.env.NEXT_PUBLIC_RPC_URL ||
-  (process.env.NEXT_PUBLIC_COINBASE_API_KEY
-    ? `https://api.developer.coinbase.com/rpc/v1/base/${process.env.NEXT_PUBLIC_COINBASE_API_KEY}`
-    : undefined) ||
-  "https://mainnet.base.org";
+  `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || "oKxs-03sij-U_N0iOlrSsZFr29-IqbuF"}`;
 
 export const publicClient = createPublicClient({
-  chain: base,
+  chain: baseSepolia,
   transport: http(rpc),
 });
