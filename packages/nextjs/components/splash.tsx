@@ -33,7 +33,7 @@ export default function GameWonButton({ tiles, hasValidMoves }: GameWonButtonPro
   useEffect(() => {
     // Reset countdown when game ends
     if (gameOver) {
-      setCountdown(5);
+      setCountdown(3);
 
       // Start countdown
       const countdownInterval = setInterval(() => {
@@ -56,7 +56,7 @@ export default function GameWonButton({ tiles, hasValidMoves }: GameWonButtonPro
           // Redirect to main page if player lost (no 2048 tile)
           router.push("/");
         }
-      }, 5000);
+      }, 3000);
 
       return () => {
         console.log("Cleaning up intervals");
