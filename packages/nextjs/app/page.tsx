@@ -1,32 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { useWallets } from "@privy-io/react-auth";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
 import Play2048 from "~~/components/Play2048";
 import CurrentPool from "~~/components/counters/currentPool";
 import NextPool from "~~/components/counters/nextPool";
 import EnterGameButton from "~~/components/enterGameButton";
 import { PrivyConnectButton } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { useActiveWallet } from "~~/hooks/useActiveWallet";
 import "~~/styles/2048styles/globals.css";
 
 const Home: NextPage = () => {
-  const { address: wagmiAddress } = useAccount();
-  const { wallets } = useWallets();
-
-  // Prioritize embedded wallet for seamless transactions (same as EnterGameButton)
-  const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
-  const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
-  const activeWallet = embeddedWallet || externalWallet;
-  const connectedAddress = (activeWallet?.address || wagmiAddress) as `0x${string}` | undefined;
+  const { address: connectedAddress } = useActiveWallet();
   const [isGameLoading, setIsGameLoading] = useState(false);
+
   const { data: playerGameId, refetch: refetchGameId } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getPlayerGameId",
     args: [connectedAddress],
   });
+
+  const { data: getCurrentRoundPool } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getCurrentRoundPool",
+  });
+
+  const { data: timeRemaining } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getTimeRemainingOfCurrentRound",
+  });
+
+  const { data: entryFee } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getEntryFee",
+  });
+
+  const { data: winnersList } = useScaffoldReadContract({
+    contractName: "Play2048Wars",
+    functionName: "getAllWinners",
+  });
+
+  const isWinner = winnersList && connectedAddress && winnersList.includes(connectedAddress as `0x${string}`);
 
   // Check if player has an active game (playerGameId != 0x0...0)
   const hasActiveGame =
@@ -69,7 +84,13 @@ const Home: NextPage = () => {
           <>
             {!hasActiveGame && !isGameLoading && (
               <div className="flex justify-center">
-                <EnterGameButton onGameEntered={handleGameEntered} />
+                <EnterGameButton
+                  onGameEntered={handleGameEntered}
+                  entryFee={entryFee}
+                  isWinner={isWinner}
+                  currentPool={getCurrentRoundPool}
+                  timeRemaining={timeRemaining}
+                />
               </div>
             )}
             {isGameLoading && (
