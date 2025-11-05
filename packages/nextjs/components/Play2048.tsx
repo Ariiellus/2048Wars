@@ -10,6 +10,7 @@ import Board from "~~/components/Board";
 import Container from "~~/components/Container";
 import Moves from "~~/components/counters/moves";
 import Score from "~~/components/counters/score";
+import GameWonButton from "~~/components/splash";
 import { Toaster } from "~~/components/ui/sonner";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useTransactions } from "~~/hooks/useTransactions";
@@ -689,6 +690,35 @@ export default function Game2048() {
     return targetTile && targetTile.value === tile.value && !targetTile.mergedFrom;
   };
 
+  // Check if there are any valid moves remaining
+  const hasValidMoves = (boardState: BoardState): boolean => {
+    // If there's an empty cell, moves are possible
+    const occupiedCells = new Set(boardState.tiles.map(t => `${t.row},${t.col}`));
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (!occupiedCells.has(`${row},${col}`)) {
+          return true; // Empty cell found
+        }
+      }
+    }
+
+    // Check if any adjacent tiles can merge
+    for (const tile of boardState.tiles) {
+      // Check right
+      if (tile.col < 3) {
+        const rightTile = boardState.tiles.find(t => t.row === tile.row && t.col === tile.col + 1);
+        if (rightTile && rightTile.value === tile.value) return true;
+      }
+      // Check down
+      if (tile.row < 3) {
+        const downTile = boardState.tiles.find(t => t.row === tile.row + 1 && t.col === tile.col);
+        if (downTile && downTile.value === tile.value) return true;
+      }
+    }
+
+    return false; // No valid moves
+  };
+
   // Display
 
   const [isLaptopOrLess, setIsLaptopOrLess] = useState(false);
@@ -724,6 +754,9 @@ export default function Game2048() {
           />
         </div>
       </div>
+
+      {/* Splash screen for game over / win */}
+      <GameWonButton tiles={boardState.tiles} hasValidMoves={hasValidMoves(boardState)} />
 
       <Toaster
         visibleToasts={isLaptopOrLess ? 1 : 3}
