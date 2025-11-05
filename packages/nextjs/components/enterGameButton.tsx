@@ -1,90 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import GameInfo from "./GameInfo";
 import PlayerVerification from "./PlayerVerification";
 import { PrivyConnectButton } from "./scaffold-eth/PrivyConnectButton";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { Hex, createWalletClient, custom, encodeFunctionData, formatEther, parseEther } from "viem";
+import { usePrivy } from "@privy-io/react-auth";
+import { Hex, createWalletClient, custom, encodeFunctionData, parseEther } from "viem";
 import { base } from "viem/chains";
 import { useBalance } from "wagmi";
-import { useEnsureBaseChain, useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useEnsureBaseChain } from "~~/hooks/scaffold-eth";
+import { useActiveWallet } from "~~/hooks/useActiveWallet";
 import { GAME_CONTRACT_ADDRESS } from "~~/utils/constants";
 import { notification } from "~~/utils/scaffold-eth";
 
 interface EnterGameButtonProps {
-  heading?: string;
-  type?: string;
   onGameEntered: () => void;
+  entryFee?: bigint;
+  isWinner?: boolean;
+  currentPool?: bigint;
+  timeRemaining?: bigint;
 }
 
-const formatTimeRemaining = (seconds: number | bigint | undefined): string => {
-  if (!seconds) return "0 days, 0 hours, 0 minutes, 0 seconds";
-
-  const totalSeconds = Number(seconds);
-  if (totalSeconds <= 0) return "0 days, 0 hours, 0 minutes, 0 seconds";
-
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-
-  return `${days} ${days === 1 ? "day" : "days"}, ${hours} ${hours === 1 ? "hour" : "hours"}, ${minutes} ${minutes === 1 ? "minute" : "minutes"}, ${secs} ${secs === 1 ? "second" : "seconds"}`;
-};
-
-export default function EnterGameButton({ onGameEntered }: EnterGameButtonProps) {
+export default function EnterGameButton({
+  onGameEntered,
+  entryFee,
+  isWinner,
+  currentPool,
+  timeRemaining,
+}: EnterGameButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [countdown, setCountdown] = useState<number>(0);
   const { ready, authenticated } = usePrivy();
-  const { wallets } = useWallets();
+  const { activeWallet, address } = useActiveWallet();
   const { switchToBase } = useEnsureBaseChain();
-
-  const { data: getCurrentRoundPool } = useScaffoldReadContract({
-    contractName: "Play2048Wars",
-    functionName: "getCurrentRoundPool",
-  });
-
-  const { data: timeRemaining } = useScaffoldReadContract({
-    contractName: "Play2048Wars",
-    functionName: "getTimeRemainingOfCurrentRound",
-  });
-
-  // Prioritize embedded wallet for seamless transactions
-  const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
-  const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
-  const activeWallet = embeddedWallet || externalWallet;
-  const address = activeWallet?.address as `0x${string}` | undefined;
 
   const { data: balance } = useBalance({
     address: address,
     chainId: base.id,
   });
-
-  const { data: entryFee } = useScaffoldReadContract({
-    contractName: "Play2048Wars",
-    functionName: "getEntryFee",
-  });
-
-  const { data: winnersList } = useScaffoldReadContract({
-    contractName: "Play2048Wars",
-    functionName: "getAllWinners",
-  });
-
-  const isWinner = winnersList && address && winnersList.includes(address as `0x${string}`);
-
-  useEffect(() => {
-    if (timeRemaining !== undefined) {
-      setCountdown(Number(timeRemaining));
-    }
-  }, [timeRemaining]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 0) return 0;
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Check if user has enough ETH for entry fee + gas (0.0015 ETH total)
   const requiredAmount = parseEther("0.0015");
@@ -212,20 +162,7 @@ export default function EnterGameButton({ onGameEntered }: EnterGameButtonProps)
             )
           )}
 
-          <div className="text-center space-y-3 pt-2">
-            <div>
-              <p className="text-base font-semibold text-600 mb-1">
-                Pool Amount:{" "}
-                <span className="text-lg font-normal text-gray-800">
-                  {formatEther(BigInt(getCurrentRoundPool || "0"))} ETH
-                </span>
-              </p>
-            </div>
-            <div>
-              <p className="text-base font-semibold text-600 mb-1">Time remaining:</p>
-              <p className="text-lg text-gray-800">{formatTimeRemaining(countdown)}</p>
-            </div>
-          </div>
+          <GameInfo currentPool={currentPool} timeRemaining={timeRemaining} />
         </div>
       </div>
     </div>
