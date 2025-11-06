@@ -36,7 +36,7 @@ export default function PlayerVerification({ address, hasInsufficientFunds, amou
       <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">
         <p className="font-bold text-sm text-red-800 mb-1">Insufficient funds!</p>
         <p className="text-sm text-red-700">
-          Deposit at least {parseFloat(formatEther(amountNeeded)).toFixed(6)} ETH to enter the game.
+          Deposit at least {parseFloat(formatEther(amountNeeded)).toFixed(4)} ETH in Base to enter the game.
         </p>
         <p className="text-xs text-red-600 mt-1">
           Current balance: {balance ? parseFloat(formatEther(BigInt(balance.value))).toFixed(6) : "0"} ETH
