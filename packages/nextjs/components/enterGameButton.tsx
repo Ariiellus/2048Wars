@@ -4,11 +4,10 @@ import PlayerVerification from "./PlayerVerification";
 import { PrivyConnectButton } from "./scaffold-eth/PrivyConnectButton";
 import { usePrivy } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, parseEther } from "viem";
-import { baseSepolia } from "viem/chains";
 import { useBalance } from "wagmi";
 import { useActiveWallet } from "~~/hooks/useActiveWallet";
-import { GAME_CONTRACT_ADDRESS } from "~~/utils/constants";
 import { notification } from "~~/utils/scaffold-eth";
+import { getContractAddress, getCurrentChain } from "~~/utils/setup";
 
 interface EnterGameButtonProps {
   onGameEntered: () => void;
@@ -31,7 +30,7 @@ export default function EnterGameButton({
 
   const { data: balance } = useBalance({
     address: address,
-    chainId: baseSepolia.id,
+    chainId: getCurrentChain()?.id,
   });
 
   // Check if user has enough ETH for entry fee + gas (0.0015 ETH total)
@@ -60,7 +59,7 @@ export default function EnterGameButton({
       // Get Ethereum provider from Privy wallet
       const ethereumProvider = await activeWallet.getEthereumProvider();
       const walletClient = createWalletClient({
-        chain: baseSepolia,
+        chain: getCurrentChain(),
         transport: custom(ethereumProvider),
       });
 
@@ -81,10 +80,10 @@ export default function EnterGameButton({
       // Send transaction using Privy wallet directly
       const txHash: Hex = await walletClient.sendTransaction({
         account: address as Hex,
-        to: GAME_CONTRACT_ADDRESS,
+        to: getContractAddress() as `0x${string}`,
         data,
         value: BigInt(entryFee),
-        chain: baseSepolia,
+        chain: getCurrentChain(),
       });
 
       console.log("Transaction sent:", txHash);

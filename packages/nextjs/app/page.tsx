@@ -8,17 +8,21 @@ import NextPool from "~~/components/counters/nextPool";
 import EnterGameButton from "~~/components/enterGameButton";
 import { PrivyConnectButton } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useActiveWallet } from "~~/hooks/useActiveWallet";
 import "~~/styles/2048styles/globals.css";
+import { AllowedChainIds } from "~~/utils/scaffold-eth";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useActiveWallet();
   const [isGameLoading, setIsGameLoading] = useState(false);
+  const { targetNetwork } = useTargetNetwork();
 
   const { data: playerGameId, refetch: refetchGameId } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getPlayerGameId",
     args: [connectedAddress],
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   // Refetch player game ID when component mounts or address changes to get fresh data
@@ -31,21 +35,25 @@ const Home: NextPage = () => {
   const { data: getCurrentRoundPool } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getCurrentRoundPool",
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   const { data: timeRemaining } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getTimeRemainingOfCurrentRound",
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   const { data: entryFee } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getEntryFee",
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   const { data: winnersList, refetch: refetchWinnersList } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getAllWinners",
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   const isWinner = winnersList && connectedAddress && winnersList.includes(connectedAddress as `0x${string}`);

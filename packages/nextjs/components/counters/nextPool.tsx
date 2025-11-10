@@ -1,10 +1,14 @@
 import { formatEther } from "viem";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
+import { AllowedChainIds } from "~~/utils/scaffold-eth";
 
 export default function NextPool() {
+  const { targetNetwork } = useTargetNetwork();
   const { data: getNextRoundPool } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getNextRoundPool",
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   return (

@@ -2,10 +2,10 @@ import { Hash, SendTransactionParameters, TransactionReceipt, WalletClient } fro
 import { Config, useWalletClient } from "wagmi";
 import { getPublicClient } from "wagmi/actions";
 import { SendTransactionMutate } from "wagmi/query";
-import scaffoldConfig from "~~/scaffold.config";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { AllowedChainIds, getBlockExplorerTxLink, notification } from "~~/utils/scaffold-eth";
 import { TransactorFuncOptions, getParsedErrorWithAllAbis } from "~~/utils/scaffold-eth/contract";
+import { networkConfig } from "~~/utils/setup";
 
 type TransactionFunc = (
   tx: (() => Promise<Hash>) | Parameters<SendTransactionMutate<Config, undefined>>[0],
@@ -51,7 +51,7 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
     let transactionHash: Hash | undefined = undefined;
     let transactionReceipt: TransactionReceipt | undefined;
     let blockExplorerTxURL = "";
-    let chainId: number = scaffoldConfig.targetNetworks[0].id;
+    let chainId: number = networkConfig.getChain().id;
     try {
       chainId = await walletClient.getChainId();
       // Get full transaction from public client
@@ -75,22 +75,16 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
         <TxnNotification message="Waiting for transaction to complete." blockExplorerLink={blockExplorerTxURL} />,
       );
 
-      transactionReceipt = await publicClient.waitForTransactionReceipt({
+      transactionReceipt = await publicClient?.waitForTransactionReceipt?.({
         hash: transactionHash,
         confirmations: options?.blockConfirmations,
       });
       notification.remove(notificationId);
 
-      if (transactionReceipt.status === "reverted") throw new Error("Transaction reverted");
+      if (transactionReceipt?.status === "reverted") throw new Error("Transaction reverted");
 
-      // notification.success(
-      //   <TxnNotification message="Transaction completed successfully!" blockExplorerLink={blockExplorerTxURL} />,
-      //   {
-      //     icon: "🎉",
-      //   },
-      // );
-
-      if (options?.onBlockConfirmation) options.onBlockConfirmation(transactionReceipt);
+      if (options?.onBlockConfirmation && transactionReceipt)
+        options.onBlockConfirmation(transactionReceipt as TransactionReceipt);
     } catch (error: any) {
       if (notificationId) {
         notification.remove(notificationId);

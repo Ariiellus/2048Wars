@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import { publicClient } from "../utils/client";
-import { GAME_CONTRACT_ADDRESS } from "../utils/constants";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, formatEther } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
-import { baseSepolia } from "viem/chains";
+import { getContractAddress, getCurrentChain } from "~~/utils/setup";
 
 export function useTransactions() {
   // User and Wallet objects.
@@ -55,7 +54,7 @@ export function useTransactions() {
 
       const ethereumProvider = await userWallet.getEthereumProvider();
       const provider = createWalletClient({
-        chain: baseSepolia,
+        chain: getCurrentChain(),
         transport: custom(ethereumProvider),
       });
 
@@ -104,7 +103,7 @@ export function useTransactions() {
       const optimizedMaxPriorityFeePerGas = maxPriorityFeePerGas ?? gasPrice / BigInt(10); // 10% of base fee
 
       console.log("Transaction parameters:", {
-        to: GAME_CONTRACT_ADDRESS,
+        to: getContractAddress() as `0x${string}`,
         account: privyUserAddress,
         nonce,
         gas: gas.toString(),
@@ -117,13 +116,13 @@ export function useTransactions() {
       // Use sendTransaction directly - it works better with Privy's embedded wallets
       const transactionHash: Hex = await provider.sendTransaction({
         account: privyUserAddress as Hex,
-        to: GAME_CONTRACT_ADDRESS,
+        to: getContractAddress() as `0x${string}`,
         data,
         nonce,
         gas,
         maxFeePerGas: optimizedMaxFeePerGas,
         maxPriorityFeePerGas: optimizedMaxPriorityFeePerGas,
-        chain: baseSepolia,
+        chain: getCurrentChain(),
         type: "eip1559",
       });
 
@@ -177,7 +176,7 @@ export function useTransactions() {
     ]
   > {
     const [latestBoard, nextMoveNumber, score] = await publicClient.readContract({
-      address: GAME_CONTRACT_ADDRESS,
+      address: getContractAddress() as `0x${string}`,
       abi: [
         {
           type: "function",
@@ -284,7 +283,7 @@ export function useTransactions() {
     try {
       estimatedGas = await publicClient.estimateGas({
         account: userAddress.current as Hex,
-        to: GAME_CONTRACT_ADDRESS,
+        to: getContractAddress() as `0x${string}`,
         data,
       });
       console.log("Estimated gas:", estimatedGas.toString());

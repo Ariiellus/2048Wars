@@ -13,7 +13,9 @@ import Score from "~~/components/counters/score";
 import GameWonButton from "~~/components/splash";
 import { Toaster } from "~~/components/ui/sonner";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useTransactions } from "~~/hooks/useTransactions";
+import { AllowedChainIds } from "~~/utils/scaffold-eth";
 
 // Types
 enum Direction {
@@ -351,10 +353,12 @@ export default function Game2048() {
   }, [user]);
 
   // Fetch the player's gameId from the contract
+  const { targetNetwork } = useTargetNetwork();
   const { data: contractGameId } = useScaffoldReadContract({
     contractName: "Play2048Wars",
     functionName: "getPlayerGameId",
     args: [address as `0x${string}`],
+    chainId: targetNetwork.id as AllowedChainIds,
   });
 
   // Track if we've initialized to prevent multiple initializations

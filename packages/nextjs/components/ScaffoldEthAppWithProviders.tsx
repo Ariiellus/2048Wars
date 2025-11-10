@@ -7,11 +7,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
-import { baseSepolia } from "viem/chains";
 import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+import { getCurrentChain } from "~~/utils/setup";
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   useInitializeNativeCurrencyPrice();
@@ -160,7 +160,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
           noPromptOnMfaRequired: false,
         },
         walletConnectCloudProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-        defaultChain: baseSepolia,
+        defaultChain: getCurrentChain(),
         supportedChains: wagmiConfig.chains as any,
       }}
     >

@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useTheme } from "next-themes";
 import { getAddress } from "viem";
-import { useAccount, useBalance, useSwitchChain } from "wagmi";
+import { useBalance } from "wagmi";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowTopRightOnSquareIcon,
@@ -16,10 +15,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { getNetworkColor, useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
-import { getTargetNetworks } from "~~/utils/scaffold-eth";
+import { useNetworkConfig } from "~~/hooks/useNetworkConfig";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth/networks";
-
-const allowedNetworks = getTargetNetworks();
+import networkConfig, { type NetworkEnvironment } from "~~/utils/setup";
 
 export const PrivyConnectButton = () => {
   const { ready, authenticated, login, logout, user } = usePrivy();
@@ -27,10 +25,7 @@ export const PrivyConnectButton = () => {
   const [mounted, setMounted] = useState(false);
   const [selectingNetwork, setSelectingNetwork] = useState(false);
   const dropdownRef = useRef<HTMLDetailsElement>(null);
-  const { switchChain } = useSwitchChain();
-  const { chain } = useAccount();
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === "dark";
+  const { currentNetwork, isDevelopment, switchNetwork } = useNetworkConfig();
 
   useEffect(() => {
     setMounted(true);
@@ -92,7 +87,17 @@ export const PrivyConnectButton = () => {
 
   const checkSumAddress = getAddress(address);
   const displayName = `${checkSumAddress.slice(0, 6)}...${checkSumAddress.slice(-4)}`;
-  const blockExplorerAddressLink = chain ? getBlockExplorerAddressLink(chain, checkSumAddress) : "#";
+  const blockExplorerAddressLink = currentNetwork
+    ? getBlockExplorerAddressLink(currentNetwork as any, checkSumAddress)
+    : "#";
+
+  // Calculate target network for switching (only in development mode)
+  const targetNetwork: NetworkEnvironment | null = isDevelopment
+    ? currentNetwork === "DEVELOPMENT"
+      ? "PRODUCTION"
+      : "DEVELOPMENT"
+    : null;
+  const targetNetworkConfig = targetNetwork ? networkConfig.getConfigFor(targetNetwork) : null;
 
   return (
     <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
@@ -143,14 +148,35 @@ export const PrivyConnectButton = () => {
             </a>
           </button>
         </li>
-        <li className={selectingNetwork ? "hidden" : ""}>
-          <div className="h-8 btn-sm rounded-xl! flex gap-3 py-3">
-            <span className="text-sm text-purple-600 font-medium">
-              {embeddedWallet ? "Embedded Wallet" : "External Wallet"}
-            </span>
-          </div>
-        </li>
-        {allowedNetworks
+
+        {/* Network switching only available in development mode */}
+        {isDevelopment && targetNetwork && targetNetworkConfig && (
+          <li className={selectingNetwork ? "hidden" : ""}>
+            <button
+              className="menu-item h-8 btn-sm rounded-xl! flex gap-3 py-3"
+              type="button"
+              onClick={() => {
+                switchNetwork(targetNetwork);
+                closeDropdown();
+                // Reload to ensure all providers update with new network
+                window.location.reload();
+              }}
+            >
+              <ArrowsRightLeftIcon className="h-6 w-4 ml-2 sm:ml-0" />
+              <span className="whitespace-nowrap">
+                Switch to{" "}
+                <span
+                  style={{
+                    color: getNetworkColor(targetNetworkConfig.chain, true),
+                  }}
+                >
+                  {targetNetworkConfig.chain.name}
+                </span>
+              </span>
+            </button>
+          </li>
+        )}
+        {/* {allowedNetworks
           .filter(allowedNetwork => allowedNetwork.id !== chain?.id)
           .map(allowedNetwork => (
             <li key={allowedNetwork.id} className={selectingNetwork ? "hidden" : ""}>
@@ -175,7 +201,7 @@ export const PrivyConnectButton = () => {
                 </span>
               </button>
             </li>
-          ))}
+          ))} */}
         <li className={selectingNetwork ? "hidden" : ""}>
           <button
             className="menu-item text-error h-8 btn-sm rounded-xl! flex gap-3 py-3"
