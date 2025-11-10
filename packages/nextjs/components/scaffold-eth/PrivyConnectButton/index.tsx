@@ -44,7 +44,7 @@ export const PrivyConnectButton = () => {
   // Prioritize embedded wallet for seamless transactions
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
   const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
-  const activeWallet = embeddedWallet || externalWallet;
+  const activeWallet = embeddedWallet ? embeddedWallet : externalWallet;
   const address = activeWallet?.address as `0x${string}` | undefined;
 
   const { data: balance } = useBalance({
@@ -158,8 +158,6 @@ export const PrivyConnectButton = () => {
               onClick={() => {
                 switchNetwork(targetNetwork);
                 closeDropdown();
-                // Reload to ensure all providers update with new network
-                window.location.reload();
               }}
             >
               <ArrowsRightLeftIcon className="h-6 w-4 ml-2 sm:ml-0" />
@@ -176,32 +174,7 @@ export const PrivyConnectButton = () => {
             </button>
           </li>
         )}
-        {/* {allowedNetworks
-          .filter(allowedNetwork => allowedNetwork.id !== chain?.id)
-          .map(allowedNetwork => (
-            <li key={allowedNetwork.id} className={selectingNetwork ? "hidden" : ""}>
-              <button
-                className="menu-item h-8 btn-sm rounded-xl! flex gap-3 py-3"
-                type="button"
-                onClick={() => {
-                  switchChain?.({ chainId: allowedNetwork.id });
-                  closeDropdown();
-                }}
-              >
-                <ArrowsRightLeftIcon className="h-6 w-4 ml-2 sm:ml-0" />
-                <span className="whitespace-nowrap">
-                  Switch to{" "}
-                  <span
-                    style={{
-                      color: getNetworkColor(allowedNetwork, isDarkMode),
-                    }}
-                  >
-                    {allowedNetwork.name}
-                  </span>
-                </span>
-              </button>
-            </li>
-          ))} */}
+
         <li className={selectingNetwork ? "hidden" : ""}>
           <button
             className="menu-item text-error h-8 btn-sm rounded-xl! flex gap-3 py-3"

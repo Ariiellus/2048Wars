@@ -47,7 +47,6 @@ const isDevelopmentMode = (): boolean => {
 // PRODUCTION mode (default): Always returns "PRODUCTION" (Base Mainnet)
 // DEVELOPMENT mode: Returns "DEVELOPMENT" (Base Sepolia) unless explicitly set to "PRODUCTION"
 const getDefaultNetwork = (): NetworkEnvironment => {
-  // In production mode (NEXT_PUBLIC_IS_DEVELOPMENT not set or false): Always use PRODUCTION
   if (!isDevelopmentMode()) {
     return "PRODUCTION";
   }
@@ -95,7 +94,8 @@ class NetworkConfigManager {
   constructor() {
     // Initialize with default network
     // Default is PRODUCTION unless NEXT_PUBLIC_IS_DEVELOPMENT=true
-    this.currentNetwork = getDefaultNetwork();
+    const defaultNetwork = getDefaultNetwork();
+    this.currentNetwork = defaultNetwork;
 
     // In development mode only: Load user preference from localStorage
     // In production mode: Always use PRODUCTION (no switching allowed)
@@ -104,6 +104,8 @@ class NetworkConfigManager {
       if (saved === "PRODUCTION" || saved === "DEVELOPMENT") {
         this.currentNetwork = saved;
       }
+    } else {
+      this.currentNetwork = "PRODUCTION";
     }
   }
 
@@ -111,6 +113,10 @@ class NetworkConfigManager {
    * Get current network environment
    */
   getCurrentNetwork(): NetworkEnvironment {
+    // In production mode, always return PRODUCTION regardless of internal state
+    if (!isDevelopmentMode()) {
+      return "PRODUCTION";
+    }
     return this.currentNetwork;
   }
 
@@ -118,7 +124,9 @@ class NetworkConfigManager {
    * Get current network configuration
    */
   getConfig(): NetworkConfig {
-    return NETWORK_CONFIGS[this.currentNetwork];
+    // In production mode, always return PRODUCTION config
+    const network = this.getCurrentNetwork();
+    return NETWORK_CONFIGS[network];
   }
 
   /**
@@ -188,7 +196,8 @@ class NetworkConfigManager {
    * Get chain for current network
    */
   getChain(): Chain {
-    return this.getConfig().chain;
+    const network = this.getCurrentNetwork();
+    return NETWORK_CONFIGS[network].chain;
   }
 
   /**
