@@ -4,12 +4,10 @@ import PlayerVerification from "./PlayerVerification";
 import { PrivyConnectButton } from "./scaffold-eth/PrivyConnectButton";
 import { usePrivy } from "@privy-io/react-auth";
 import { Hex, createWalletClient, custom, encodeFunctionData, parseEther } from "viem";
-import { base } from "viem/chains";
 import { useBalance } from "wagmi";
-import { useEnsureBaseChain } from "~~/hooks/scaffold-eth";
 import { useActiveWallet } from "~~/hooks/useActiveWallet";
-import { GAME_CONTRACT_ADDRESS } from "~~/utils/constants";
 import { notification } from "~~/utils/scaffold-eth";
+import { getContractAddress, getCurrentChain } from "~~/utils/setup";
 
 interface EnterGameButtonProps {
   onGameEntered: () => void;
@@ -29,11 +27,10 @@ export default function EnterGameButton({
   const [isLoading, setIsLoading] = useState(false);
   const { ready, authenticated } = usePrivy();
   const { activeWallet, address } = useActiveWallet();
-  const { switchToBase } = useEnsureBaseChain();
 
   const { data: balance } = useBalance({
     address: address,
-    chainId: base.id,
+    chainId: getCurrentChain()?.id,
   });
 
   // Check if user has enough ETH for entry fee + gas (0.0015 ETH total)
@@ -59,22 +56,10 @@ export default function EnterGameButton({
     try {
       setIsLoading(true);
 
-      const switched = await switchToBase();
-      if (!switched) {
-        notification.error(
-          <>
-            <p className="font-bold">Failed to switch network</p>
-            <p className="text-sm">Please switch to Base network manually in your wallet to continue.</p>
-          </>,
-        );
-        setIsLoading(false);
-        return;
-      }
-
       // Get Ethereum provider from Privy wallet
       const ethereumProvider = await activeWallet.getEthereumProvider();
       const walletClient = createWalletClient({
-        chain: base,
+        chain: getCurrentChain(),
         transport: custom(ethereumProvider),
       });
 
@@ -95,10 +80,10 @@ export default function EnterGameButton({
       // Send transaction using Privy wallet directly
       const txHash: Hex = await walletClient.sendTransaction({
         account: address as Hex,
-        to: GAME_CONTRACT_ADDRESS,
+        to: getContractAddress() as `0x${string}`,
         data,
         value: BigInt(entryFee),
-        chain: base,
+        chain: getCurrentChain(),
       });
 
       console.log("Transaction sent:", txHash);

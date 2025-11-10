@@ -1,7 +1,7 @@
 import { formatEther } from "viem";
-import { base } from "viem/chains";
 import { useBalance } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { getCurrentChain } from "~~/utils/setup";
 
 interface PlayerVerificationProps {
   address: `0x${string}` | undefined;
@@ -12,7 +12,7 @@ interface PlayerVerificationProps {
 export default function PlayerVerification({ address, hasInsufficientFunds, amountNeeded }: PlayerVerificationProps) {
   const { data: balance } = useBalance({
     address: address,
-    chainId: base.id,
+    chainId: getCurrentChain()?.id,
   });
 
   const { data: winnersList } = useScaffoldReadContract({

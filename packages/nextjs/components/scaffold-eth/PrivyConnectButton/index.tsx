@@ -7,13 +7,17 @@ import { useBalance } from "wagmi";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowTopRightOnSquareIcon,
+  ArrowsRightLeftIcon,
   CheckCircleIcon,
   ChevronDownIcon,
   DocumentDuplicateIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
 import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
-import { useCopyToClipboard, useEnsureBaseChain, useOutsideClick } from "~~/hooks/scaffold-eth";
+import { getNetworkColor, useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
+import { useNetworkConfig } from "~~/hooks/useNetworkConfig";
+import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth/networks";
+import networkConfig, { type NetworkEnvironment } from "~~/utils/setup";
 
 export const PrivyConnectButton = () => {
   const { ready, authenticated, login, logout, user } = usePrivy();
@@ -21,9 +25,7 @@ export const PrivyConnectButton = () => {
   const [mounted, setMounted] = useState(false);
   const [selectingNetwork, setSelectingNetwork] = useState(false);
   const dropdownRef = useRef<HTMLDetailsElement>(null);
-
-  // Auto-switch to Base chain when wallet connects
-  useEnsureBaseChain(true);
+  const { currentNetwork, isDevelopment, switchNetwork } = useNetworkConfig();
 
   useEffect(() => {
     setMounted(true);
@@ -42,7 +44,7 @@ export const PrivyConnectButton = () => {
   // Prioritize embedded wallet for seamless transactions
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
   const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
-  const activeWallet = embeddedWallet || externalWallet;
+  const activeWallet = embeddedWallet ? embeddedWallet : externalWallet;
   const address = activeWallet?.address as `0x${string}` | undefined;
 
   const { data: balance } = useBalance({
@@ -85,7 +87,17 @@ export const PrivyConnectButton = () => {
 
   const checkSumAddress = getAddress(address);
   const displayName = `${checkSumAddress.slice(0, 6)}...${checkSumAddress.slice(-4)}`;
-  const blockExplorerAddressLink = `https://basescan.org/address/${checkSumAddress}`;
+  const blockExplorerAddressLink = currentNetwork
+    ? getBlockExplorerAddressLink(currentNetwork as any, checkSumAddress)
+    : "#";
+
+  // Calculate target network for switching (only in development mode)
+  const targetNetwork: NetworkEnvironment | null = isDevelopment
+    ? currentNetwork === "DEVELOPMENT"
+      ? "PRODUCTION"
+      : "DEVELOPMENT"
+    : null;
+  const targetNetworkConfig = targetNetwork ? networkConfig.getConfigFor(targetNetwork) : null;
 
   return (
     <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
@@ -136,13 +148,33 @@ export const PrivyConnectButton = () => {
             </a>
           </button>
         </li>
-        <li className={selectingNetwork ? "hidden" : ""}>
-          <div className="h-8 btn-sm rounded-xl! flex gap-3 py-3">
-            <span className="text-sm text-purple-600 font-medium">
-              {embeddedWallet ? "Embedded Wallet" : "External Wallet"}
-            </span>
-          </div>
-        </li>
+
+        {/* Network switching only available in development mode */}
+        {isDevelopment && targetNetwork && targetNetworkConfig && (
+          <li className={selectingNetwork ? "hidden" : ""}>
+            <button
+              className="menu-item h-8 btn-sm rounded-xl! flex gap-3 py-3"
+              type="button"
+              onClick={() => {
+                switchNetwork(targetNetwork);
+                closeDropdown();
+              }}
+            >
+              <ArrowsRightLeftIcon className="h-6 w-4 ml-2 sm:ml-0" />
+              <span className="whitespace-nowrap">
+                Switch to{" "}
+                <span
+                  style={{
+                    color: getNetworkColor(targetNetworkConfig.chain, true),
+                  }}
+                >
+                  {targetNetworkConfig.chain.name}
+                </span>
+              </span>
+            </button>
+          </li>
+        )}
+
         <li className={selectingNetwork ? "hidden" : ""}>
           <button
             className="menu-item text-error h-8 btn-sm rounded-xl! flex gap-3 py-3"

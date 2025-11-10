@@ -10,16 +10,11 @@ import {
   CheckCircleIcon,
   ChevronDownIcon,
   DocumentDuplicateIcon,
-  EyeIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
 import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
-import { getTargetNetworks } from "~~/utils/scaffold-eth";
-
-const BURNER_WALLET_ID = "burnerWallet";
-
-const allowedNetworks = getTargetNetworks();
+import { getCurrentChain } from "~~/utils/setup";
 
 type AddressInfoDropdownProps = {
   address: Address;
@@ -35,7 +30,7 @@ export const AddressInfoDropdown = ({
   blockExplorerAddressLink,
 }: AddressInfoDropdownProps) => {
   const { disconnect } = useDisconnect();
-  const { connector } = useAccount();
+  const { chain } = useAccount();
   const checkSumAddress = getAddress(address);
 
   const { copyToClipboard: copyAddressToClipboard, isCopiedToClipboard: isAddressCopiedToClipboard } =
@@ -99,7 +94,7 @@ export const AddressInfoDropdown = ({
               </a>
             </button>
           </li>
-          {allowedNetworks.length > 1 ? (
+          {getCurrentChain()?.id !== chain?.id ? (
             <li className={selectingNetwork ? "hidden" : ""}>
               <button
                 className="h-8 btn-sm rounded-xl! flex gap-3 py-3"
@@ -112,14 +107,14 @@ export const AddressInfoDropdown = ({
               </button>
             </li>
           ) : null}
-          {connector?.id === BURNER_WALLET_ID ? (
+          {/* {connector?.id === BURNER_WALLET_ID ? (
             <li>
               <label htmlFor="reveal-burner-pk-modal" className="h-8 btn-sm rounded-xl! flex gap-3 py-3 text-error">
                 <EyeIcon className="h-6 w-4 ml-2 sm:ml-0" />
                 <span>Reveal Private Key</span>
               </label>
             </li>
-          ) : null}
+          ) : null} */}
           <li className={selectingNetwork ? "hidden" : ""}>
             <button
               className="menu-item text-error h-8 btn-sm rounded-xl! flex gap-3 py-3"

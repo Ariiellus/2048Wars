@@ -1,4 +1,5 @@
 import * as chains from "viem/chains";
+import { networkConfig } from "~~/utils/setup";
 
 export type BaseConfig = {
   targetNetworks: readonly chains.Chain[];
@@ -13,9 +14,25 @@ export type ScaffoldConfig = BaseConfig;
 
 export const DEFAULT_ALCHEMY_API_KEY = "oKxs-03sij-U_N0iOlrSsZFr29-IqbuF";
 
-const scaffoldConfig = {
-  // The networks on which your DApp is live
-  targetNetworks: [chains.base],
+const getRpcUrlForChain = (chainId: number): string => {
+  const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || DEFAULT_ALCHEMY_API_KEY;
+
+  if (chainId === chains.base.id && process.env.NEXT_PUBLIC_COINBASE_API_KEY) {
+    return `https://api.developer.coinbase.com/rpc/v1/base/${process.env.NEXT_PUBLIC_COINBASE_API_KEY}`;
+  }
+
+  if (chainId === chains.base.id) {
+    return networkConfig.getConfigFor("PRODUCTION").rpcUrl;
+  } else if (chainId === chains.baseSepolia.id) {
+    return networkConfig.getConfigFor("DEVELOPMENT").rpcUrl;
+  }
+
+  const chainName = chainId === chains.base.id ? "base-mainnet" : "base-sepolia";
+  return `https://${chainName}.g.alchemy.com/v2/${alchemyKey}`;
+};
+
+const scaffoldConfig: ScaffoldConfig = {
+  targetNetworks: networkConfig.getTargetChains(),
   // The interval at which your front-end polls the RPC servers for new data (it has no effect if you only target the local network (default is 4000))
   pollingInterval: 30000,
   // This is ours Alchemy's default API key.
@@ -23,13 +40,10 @@ const scaffoldConfig = {
   // It's recommended to store it in an env variable:
   // .env.local for local testing, and in the Vercel/system env config for live apps.
   alchemyApiKey: process.env.ALCHEMY_API_KEY || DEFAULT_ALCHEMY_API_KEY,
-  // If you want to use a different RPC for a specific network, you can add it here.
   // The key is the chain ID, and the value is the HTTP RPC URL
   rpcOverrides: {
-    // Using multiple RPC endpoints for Base network to avoid rate limits
-    [chains.base.id]: process.env.NEXT_PUBLIC_COINBASE_API_KEY
-      ? `https://api.developer.coinbase.com/rpc/v1/base/${process.env.NEXT_PUBLIC_COINBASE_API_KEY}`
-      : `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || DEFAULT_ALCHEMY_API_KEY}`,
+    [chains.baseSepolia.id]: getRpcUrlForChain(chains.baseSepolia.id),
+    [chains.base.id]: getRpcUrlForChain(chains.base.id),
   },
   // This is ours WalletConnect's default project ID.
   // You can get your own at https://cloud.walletconnect.com
@@ -37,6 +51,6 @@ const scaffoldConfig = {
   // .env.local for local testing, and in the Vercel/system env config for live apps.
   walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "3a8170812b534d0ff9d794f19a901d64",
   onlyLocalBurnerWallet: true,
-} as const satisfies ScaffoldConfig;
+};
 
 export default scaffoldConfig;

@@ -8,6 +8,7 @@ import { ContractWriteMethods } from "./ContractWriteMethods";
 import { Address, Balance } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
+import { AllowedChainIds } from "~~/utils/scaffold-eth";
 import { ContractName } from "~~/utils/scaffold-eth/contract";
 
 type ContractUIProps = {
@@ -21,7 +22,10 @@ type ContractUIProps = {
 export const ContractUI = ({ contractName, className = "" }: ContractUIProps) => {
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
   const { targetNetwork } = useTargetNetwork();
-  const { data: deployedContractData, isLoading: deployedContractLoading } = useDeployedContractInfo({ contractName });
+  const { data: deployedContractData, isLoading: deployedContractLoading } = useDeployedContractInfo({
+    contractName,
+    chainId: targetNetwork.id as AllowedChainIds,
+  });
   const networkColor = useNetworkColor();
 
   if (deployedContractLoading) {
@@ -33,9 +37,11 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
   }
 
   if (!deployedContractData) {
+    const networkName = String(targetNetwork.name);
+    const contractNameStr = String(contractName);
     return (
       <p className="text-3xl mt-14">
-        {`No contract found by the name of "${contractName}" on chain "${targetNetwork.name}"!`}
+        {`No contract found by the name of "${contractNameStr}" on chain "${networkName}"!`}
       </p>
     );
   }
@@ -47,7 +53,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
           <div className="bg-base-100 border-base-300 border shadow-md shadow-secondary rounded-3xl px-6 lg:px-8 mb-6 space-y-1 py-4">
             <div className="flex">
               <div className="flex flex-col gap-1">
-                <span className="font-bold">{contractName}</span>
+                <span className="font-bold">{String(contractName)}</span>
                 <Address address={deployedContractData.address} onlyEnsOrAddress />
                 <div className="flex gap-1 items-center">
                   <span className="font-bold text-sm">Balance:</span>
@@ -58,7 +64,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
             {targetNetwork && (
               <p className="my-0 text-sm">
                 <span className="font-bold">Network</span>:{" "}
-                <span style={{ color: networkColor }}>{targetNetwork.name}</span>
+                <span style={{ color: networkColor }}>{String(targetNetwork.name)}</span>
               </p>
             )}
           </div>
