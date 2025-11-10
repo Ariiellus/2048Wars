@@ -78,7 +78,7 @@ export const PrivyConnectButton = () => {
           login();
         }}
       >
-        Connect Wallet
+        Login
       </button>
     );
   }

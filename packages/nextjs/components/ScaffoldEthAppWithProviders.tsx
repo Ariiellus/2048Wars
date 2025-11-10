@@ -140,8 +140,8 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
           theme: mounted ? (isDarkMode ? "dark" : "light") : "light",
           accentColor: "#2299dd",
           logo: "/2048Wars-Logo.png",
-          landingHeader: isInFarcaster ? "Sign in with Farcaster" : "Connect Wallet",
-          loginMessage: isInFarcaster ? "Sign in to play 2048Wars" : "Sign in to continue",
+          landingHeader: isInFarcaster ? "Sign in with Farcaster" : "Login",
+          loginMessage: isInFarcaster ? "Sign in to play 2048Wars" : "Login to continue",
         },
         loginMethods: loginMethods as any,
         embeddedWallets: {
