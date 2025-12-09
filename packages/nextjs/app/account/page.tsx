@@ -51,7 +51,6 @@ export default function AccountPage() {
   const sourceWallet = transferFrom === "embedded" ? embeddedWallet : externalWallet;
   const destinationWallet = transferFrom === "embedded" ? externalWallet : embeddedWallet;
   const sourceBalance = transferFrom === "embedded" ? embeddedBalance : externalBalance;
-  const sourceEns = transferFrom === "embedded" ? embeddedEns : externalEns;
   const destinationEns = transferFrom === "embedded" ? externalEns : embeddedEns;
 
   // Set max amount from source wallet
@@ -94,7 +93,7 @@ export default function AccountPage() {
       });
 
       // Send transaction
-      const hash = await walletClient.sendTransaction({
+      await walletClient.sendTransaction({
         account: sourceWallet.address as `0x${string}`,
         to: destinationWallet.address as `0x${string}`,
         value: parseEther(amount),
