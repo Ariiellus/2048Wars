@@ -52,7 +52,6 @@ export default function AccountPage() {
   const sourceWallet = transferFrom === "embedded" ? embeddedWallet : externalWallet;
   const destinationWallet = transferFrom === "embedded" ? externalWallet : embeddedWallet;
   const sourceBalance = transferFrom === "embedded" ? embeddedBalance : externalBalance;
-  const sourceEns = transferFrom === "embedded" ? embeddedEns : externalEns;
   const destinationEns = transferFrom === "embedded" ? externalEns : embeddedEns;
 
   // Set max amount from source wallet
