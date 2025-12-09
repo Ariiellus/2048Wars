@@ -15,17 +15,18 @@ export default function AccountPage() {
   const [txHash, setTxHash] = useState("");
   const [error, setError] = useState("");
   const [transferFrom, setTransferFrom] = useState<"embedded" | "external">("external");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Get embedded and external wallets
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
   const externalWallet = wallets.find(wallet => wallet.walletClientType !== "privy");
 
   // Get balances
-  const { data: embeddedBalance } = useBalance({
+  const { data: embeddedBalance, refetch: refetchEmbeddedBalance } = useBalance({
     address: embeddedWallet?.address as `0x${string}` | undefined,
   });
 
-  const { data: externalBalance } = useBalance({
+  const { data: externalBalance, refetch: refetchExternalBalance } = useBalance({
     address: externalWallet?.address as `0x${string}` | undefined,
   });
 
@@ -105,6 +106,12 @@ export default function AccountPage() {
 
       setTxHash(hash);
       setAmount("");
+
+      // Wait a bit for transaction to be mined, then refresh balances
+      setTimeout(async () => {
+        await Promise.all([refetchEmbeddedBalance(), refetchExternalBalance()]);
+        setRefreshKey(prev => prev + 1);
+      }, 2000);
     } catch (err: any) {
       console.error("Transfer error:", err);
       setError(err.message || "Transfer failed");
@@ -114,7 +121,7 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-8">Account Management</h1>
 
       {/* Wallet Status */}
@@ -122,7 +129,7 @@ export default function AccountPage() {
         {/* Embedded Wallet Card */}
         <div className="bg-base-200 rounded-xl p-6 border border-base-300">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Embedded Wallet</h2>
+            <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Game Account</h2>
           </div>
           {embeddedWallet ? (
             <>
@@ -149,7 +156,7 @@ export default function AccountPage() {
         </div>
 
         {/* External Wallet Card */}
-        <div className="bg-base-200 rounded-xl p-6 border border-base-300">
+        <div className="bg-base-200 rounded-xl p-6 border border-base-300 w-90">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Connected Wallet</h2>
           </div>
@@ -196,8 +203,8 @@ export default function AccountPage() {
                 className="select select-bordered w-full"
                 disabled={isTransferring}
               >
-                <option value="external">Connected Wallet</option>
-                <option value="embedded">Embedded Wallet</option>
+                <option value="external">{externalEns || externalWallet?.address}</option>
+                <option value="embedded">{embeddedEns || embeddedWallet?.address}</option>
               </select>
             </div>
 
@@ -247,15 +254,6 @@ export default function AccountPage() {
             {error && (
               <div className="alert alert-error mb-4">
                 <span>{error}</span>
-              </div>
-            )}
-
-            {txHash && (
-              <div className="alert alert-success">
-                <div>
-                  <p className="font-semibold">Transaction Successful!</p>
-                  <p className="text-sm font-mono break-all">Hash: {txHash}</p>
-                </div>
               </div>
             )}
           </div>
