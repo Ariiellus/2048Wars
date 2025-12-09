@@ -12,10 +12,8 @@ export default function AccountPage() {
   const { wallets } = useWallets();
   const [amount, setAmount] = useState("");
   const [isTransferring, setIsTransferring] = useState(false);
-  const [txHash, setTxHash] = useState("");
   const [error, setError] = useState("");
   const [transferFrom, setTransferFrom] = useState<"embedded" | "external">("external");
-  const [refreshKey, setRefreshKey] = useState(0);
 
   // Get embedded and external wallets
   const embeddedWallet = wallets.find(wallet => wallet.walletClientType === "privy");
@@ -82,7 +80,6 @@ export default function AccountPage() {
 
     setIsTransferring(true);
     setError("");
-    setTxHash("");
 
     try {
       if (!sourceWallet || !destinationWallet) {
@@ -104,13 +101,11 @@ export default function AccountPage() {
         chain: getCurrentChain(),
       });
 
-      setTxHash(hash);
       setAmount("");
 
       // Wait a bit for transaction to be mined, then refresh balances
       setTimeout(async () => {
         await Promise.all([refetchEmbeddedBalance(), refetchExternalBalance()]);
-        setRefreshKey(prev => prev + 1);
       }, 2000);
     } catch (err: any) {
       console.error("Transfer error:", err);

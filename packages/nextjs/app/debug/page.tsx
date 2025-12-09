@@ -1,6 +1,5 @@
 import { DebugContracts } from "./_components/DebugContracts";
 import type { NextPage } from "next";
-import { useNetworkConfig } from "~~/hooks/useNetworkConfig";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 import { isDevMode } from "~~/utils/setup";
 
