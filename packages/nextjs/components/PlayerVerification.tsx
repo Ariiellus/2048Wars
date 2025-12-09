@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { formatEther } from "viem";
 import { useBalance } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
@@ -10,6 +11,7 @@ interface PlayerVerificationProps {
 }
 
 export default function PlayerVerification({ address, hasInsufficientFunds, amountNeeded }: PlayerVerificationProps) {
+  const router = useRouter();
   const { data: balance } = useBalance({
     address: address,
     chainId: getCurrentChain()?.id,
@@ -41,6 +43,14 @@ export default function PlayerVerification({ address, hasInsufficientFunds, amou
         <p className="text-xs text-red-600 mt-1">
           Current balance: {balance ? parseFloat(formatEther(BigInt(balance.value))).toFixed(6) : "0"} ETH
         </p>
+        <button
+          className="btn btn-primary w-full rounded-xl mb-6"
+          onClick={() => {
+            router.push("/account");
+          }}
+        >
+          Deposit
+        </button>
       </div>
     );
   }
